@@ -25,7 +25,7 @@ export default function Home() {
 
       {/* Green blob background - edge to edge, top aligned */}
       <svg 
-        className="absolute top-0 left-0 w-full h-[320px] pointer-events-none z-0"
+        className="absolute top-0 left-0 w-full h-[260px] pointer-events-none z-0"
         viewBox="0 0 1419 320" 
         fill="none" 
         xmlns="http://www.w3.org/2000/svg"
