@@ -269,12 +269,6 @@ export function GameCanvas() {
           isSliding = true;
         }
       }
-      // R key to restart game after game over
-      if (e.code === "KeyR" && gameOver) {
-        setGameOver(false);
-        setIsPlaying(true);
-        setScore(0);
-      }
     };
     
     // Key up handler - stop sliding when key is released
