@@ -54,6 +54,32 @@ export function GameCanvas() {
     // When it exceeds the canvas width, we reset it to create seamless looping.
     let groundScrollX = 0;
     
+    // --- OBSTACLE CONFIGURATION ---
+    // Obstacles spawn from the right and move left toward the player
+    const OBSTACLE_WIDTH = 30;          // Width of obstacle rectangles
+    const OBSTACLE_HEIGHT = 50;         // Height of obstacle rectangles
+    const OBSTACLE_SPEED = GROUND_SPEED; // Match ground speed for consistent movement
+    const MIN_SPAWN_DELAY = 60;         // Minimum frames between obstacle spawns
+    const MAX_SPAWN_DELAY = 150;        // Maximum frames between obstacle spawns
+    
+    // Obstacle type definition
+    interface Obstacle {
+      x: number;      // X position (left edge of obstacle)
+      y: number;      // Y position (top edge of obstacle)
+      width: number;  // Width of this obstacle
+      height: number; // Height of this obstacle
+    }
+    
+    // --- OBSTACLE ARRAY ---
+    // Stores all active obstacles on screen
+    // Obstacles are added when spawned and removed when off-screen
+    const obstacles: Obstacle[] = [];
+    
+    // Track when to spawn the next obstacle
+    // Using random delay creates varied spacing between obstacles
+    let framesSinceLastSpawn = 0;
+    let nextSpawnDelay = MIN_SPAWN_DELAY + Math.random() * (MAX_SPAWN_DELAY - MIN_SPAWN_DELAY);
+    
     // --- JUMP INPUT HANDLER ---
     // Triggered by spacebar or canvas click
     // Only allows jumping when the reindeer is on the ground
@@ -135,6 +161,50 @@ export function GameCanvas() {
       
       // Second ground segment (coming in from the right to fill the gap)
       ctx.fillRect(CANVAS_WIDTH - groundScrollX, GROUND_Y, CANVAS_WIDTH, GROUND_HEIGHT);
+
+      // --- OBSTACLE SPAWNING ---
+      // Check if it's time to spawn a new obstacle
+      framesSinceLastSpawn++;
+      
+      if (framesSinceLastSpawn >= nextSpawnDelay) {
+        // Spawn a new obstacle at the right edge of the screen
+        // Obstacle sits on top of the ground
+        const newObstacle: Obstacle = {
+          x: CANVAS_WIDTH,                                    // Start at right edge
+          y: GROUND_Y - OBSTACLE_HEIGHT,                      // Sit on ground
+          width: OBSTACLE_WIDTH,
+          height: OBSTACLE_HEIGHT
+        };
+        
+        obstacles.push(newObstacle);
+        
+        // Reset spawn timer with new random delay
+        framesSinceLastSpawn = 0;
+        nextSpawnDelay = MIN_SPAWN_DELAY + Math.random() * (MAX_SPAWN_DELAY - MIN_SPAWN_DELAY);
+      }
+      
+      // --- OBSTACLE UPDATE AND DRAW ---
+      // Loop through obstacles backwards so we can safely remove items
+      for (let i = obstacles.length - 1; i >= 0; i--) {
+        const obstacle = obstacles[i];
+        
+        // Move obstacle left (toward the player)
+        obstacle.x -= OBSTACLE_SPEED;
+        
+        // Remove obstacle if it's completely off-screen (left edge)
+        if (obstacle.x + obstacle.width < 0) {
+          obstacles.splice(i, 1);
+          continue;
+        }
+        
+        // Draw obstacle (tree/log placeholder - green rectangle)
+        ctx.fillStyle = "#166534"; // Dark green for trees
+        ctx.fillRect(obstacle.x, obstacle.y, obstacle.width, obstacle.height);
+        
+        // Add a lighter top to make it look more like a tree/stump
+        ctx.fillStyle = "#22c55e"; // Lighter green
+        ctx.fillRect(obstacle.x + 5, obstacle.y, obstacle.width - 10, 10);
+      }
 
       // --- APPLY JUMP PHYSICS ---
       // Physics simulation using velocity-based movement:
