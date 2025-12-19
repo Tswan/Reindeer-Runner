@@ -664,17 +664,6 @@ export function GameCanvas() {
         ctx.fillRect(carrot.x + 5, carrot.y, carrot.width - 10, 8);
       }
       
-      // --- DRAW SCORE ON CANVAS ---
-      ctx.fillStyle = "white";
-      ctx.font = "bold 24px 'Mountains of Christmas'";
-      ctx.textAlign = "left";
-      ctx.fillText(`Score: ${internalScore}`, 20, 35);
-      
-      // Draw speed indicator (optional - shows difficulty)
-      ctx.font = "14px 'Mountains of Christmas'";
-      ctx.fillStyle = "rgba(255,255,255,0.6)";
-      ctx.fillText(`Speed: ${currentSpeed.toFixed(1)}x`, 20, 55);
-      
       // Restore canvas state (end screen shake transform)
       ctx.restore();
 
