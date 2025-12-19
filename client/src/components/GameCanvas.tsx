@@ -29,9 +29,19 @@ export function GameCanvas() {
     const CANVAS_HEIGHT = 400;
     const REINDEER_SIZE = 40;
     
+    // --- GROUND SCROLLING CONFIGURATION ---
+    const GROUND_HEIGHT = 20;           // Height of the ground rectangle
+    const GROUND_Y = CANVAS_HEIGHT - GROUND_HEIGHT; // Y position of ground
+    const GROUND_SPEED = 5;             // Pixels to scroll per frame (adjust for faster/slower movement)
+    
     // Game state (refs for loop performance)
     let frameCount = 0;
-    let reindeerY = CANVAS_HEIGHT - REINDEER_SIZE - 20; // Starting ground position
+    let reindeerY = CANVAS_HEIGHT - REINDEER_SIZE - GROUND_HEIGHT; // Starting ground position
+    
+    // --- GROUND SCROLL POSITION ---
+    // This tracks how far the ground has scrolled.
+    // When it exceeds the canvas width, we reset it to create seamless looping.
+    let groundScrollX = 0;
 
     const animate = () => {
       if (!isPlaying || gameOver) return;
@@ -64,9 +74,26 @@ export function GameCanvas() {
         ctx.fillRect(Math.random() * CANVAS_WIDTH, Math.random() * CANVAS_HEIGHT / 2, 2, 2);
       }
 
-      // Ground (snow)
-      ctx.fillStyle = "#f1f5f9";
-      ctx.fillRect(0, CANVAS_HEIGHT - 20, CANVAS_WIDTH, 20);
+      // --- SCROLLING GROUND ---
+      // Update ground scroll position (moves left each frame)
+      groundScrollX += GROUND_SPEED;
+      
+      // Reset scroll position when it exceeds canvas width for seamless loop
+      // Using modulo ensures the ground tiles back to the start without a visible jump
+      if (groundScrollX >= CANVAS_WIDTH) {
+        groundScrollX = 0;
+      }
+      
+      // Draw ground - we draw two segments to create seamless scrolling:
+      // 1. First segment: starts at -groundScrollX (moving left off-screen)
+      // 2. Second segment: starts at CANVAS_WIDTH - groundScrollX (fills the gap on the right)
+      ctx.fillStyle = "#f1f5f9"; // Snow white color
+      
+      // First ground segment (scrolling off to the left)
+      ctx.fillRect(-groundScrollX, GROUND_Y, CANVAS_WIDTH, GROUND_HEIGHT);
+      
+      // Second ground segment (coming in from the right to fill the gap)
+      ctx.fillRect(CANVAS_WIDTH - groundScrollX, GROUND_Y, CANVAS_WIDTH, GROUND_HEIGHT);
 
       // --- DRAW ENTITIES ---
       // Reindeer (placeholder box)
@@ -105,9 +132,16 @@ export function GameCanvas() {
     } else {
       // Initial render when not playing
       ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+      
+      // Draw static background
       ctx.fillStyle = "#0f172a";
       ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
       
+      // Draw static ground at the bottom
+      ctx.fillStyle = "#f1f5f9";
+      ctx.fillRect(0, CANVAS_HEIGHT - 20, CANVAS_WIDTH, 20);
+      
+      // Draw "Press Start" message
       ctx.fillStyle = "#f1f5f9";
       ctx.font = "30px 'Mountains of Christmas'";
       ctx.textAlign = "center";
