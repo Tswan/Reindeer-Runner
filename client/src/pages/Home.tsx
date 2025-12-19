@@ -6,7 +6,6 @@ export default function Home() {
     <div className="min-h-screen w-full relative overflow-hidden bg-white">
       {/* Ambient background effects */}
       <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/stardust.png')] opacity-20 pointer-events-none" />
-      
       {/* Snowflakes (CSS Animation) */}
       {[...Array(20)].map((_, i) => (
         <div 
@@ -22,7 +21,6 @@ export default function Home() {
           ❄
         </div>
       ))}
-
       {/* Green blob background - mobile version (proportional) */}
       <svg 
         className="absolute top-0 left-0 w-full h-[350px] pointer-events-none z-0 md:hidden"
@@ -39,7 +37,6 @@ export default function Home() {
           </radialGradient>
         </defs>
       </svg>
-      
       {/* Green blob background - desktop version (full width) */}
       <svg 
         className="absolute top-0 left-0 w-full h-[280px] pointer-events-none z-0 hidden md:block"
@@ -56,14 +53,13 @@ export default function Home() {
           </radialGradient>
         </defs>
       </svg>
-
       <main className="relative z-10 container mx-auto px-4 py-12 flex flex-col gap-16">
         {/* Header */}
         <div className="text-center space-y-4">
           <h1 className="text-6xl md:text-8xl font-display text-transparent bg-clip-text bg-gradient-to-b from-white via-blue-100 to-blue-300 drop-shadow-[0_0_15px_rgba(255,255,255,0.3)]">
             Reindeer Runner
           </h1>
-          <p className="text-lg md:text-xl text-blue-200/80 font-light max-w-2xl mx-auto">
+          <p className="text-lg md:text-xl font-light max-w-2xl mx-auto text-[D6FFF0]">
             Dash through the snow, jump over obstacles, and help Santa deliver presents in this endless winter adventure!
           </p>
         </div>
@@ -74,7 +70,6 @@ export default function Home() {
         </section>
 
       </main>
-
       {/* Footer section with SVG background */}
       <div className="relative">
         {/* Footer background SVG - extends above container */}
