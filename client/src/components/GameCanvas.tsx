@@ -80,6 +80,34 @@ export function GameCanvas() {
     let framesSinceLastSpawn = 0;
     let nextSpawnDelay = MIN_SPAWN_DELAY + Math.random() * (MAX_SPAWN_DELAY - MIN_SPAWN_DELAY);
     
+    // Reindeer position (X is constant, Y changes with jumping)
+    const REINDEER_X = 100;
+    
+    // --- COLLISION DETECTION ---
+    // Simple AABB (Axis-Aligned Bounding Box) rectangle collision detection
+    // Returns true if two rectangles overlap
+    // This is efficient and works well for rectangular hitboxes
+    const checkCollision = (
+      rect1: { x: number; y: number; width: number; height: number },
+      rect2: { x: number; y: number; width: number; height: number }
+    ): boolean => {
+      // Two rectangles collide if they overlap on BOTH axes
+      // No collision if: one is completely left, right, above, or below the other
+      return (
+        rect1.x < rect2.x + rect2.width &&   // rect1's left edge is left of rect2's right edge
+        rect1.x + rect1.width > rect2.x &&   // rect1's right edge is right of rect2's left edge
+        rect1.y < rect2.y + rect2.height &&  // rect1's top edge is above rect2's bottom edge
+        rect1.y + rect1.height > rect2.y     // rect1's bottom edge is below rect2's top edge
+      );
+    };
+    
+    // --- TRIGGER GAME OVER ---
+    // Called when collision is detected
+    const triggerGameOver = () => {
+      setIsPlaying(false);
+      setGameOver(true);
+    };
+    
     // --- JUMP INPUT HANDLER ---
     // Triggered by spacebar or canvas click
     // Only allows jumping when the reindeer is on the ground
@@ -93,11 +121,17 @@ export function GameCanvas() {
     };
     
     // --- EVENT LISTENERS FOR JUMP INPUT ---
-    // Spacebar handler
+    // Spacebar handler and R key for restart
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.code === "Space") {
         e.preventDefault(); // Prevent page scrolling
         handleJump();
+      }
+      // R key to restart game after game over
+      if (e.code === "KeyR" && gameOver) {
+        setGameOver(false);
+        setIsPlaying(true);
+        setScore(0);
       }
     };
     
@@ -204,6 +238,21 @@ export function GameCanvas() {
         // Add a lighter top to make it look more like a tree/stump
         ctx.fillStyle = "#22c55e"; // Lighter green
         ctx.fillRect(obstacle.x + 5, obstacle.y, obstacle.width - 10, 10);
+        
+        // --- CHECK COLLISION WITH REINDEER ---
+        // Define reindeer hitbox (slightly smaller than visual for fairness)
+        const reindeerHitbox = {
+          x: REINDEER_X + 5,           // Slight padding for forgiving hitbox
+          y: reindeerY + 5,
+          width: REINDEER_SIZE - 10,
+          height: REINDEER_SIZE - 5
+        };
+        
+        // Check if reindeer collides with this obstacle
+        if (checkCollision(reindeerHitbox, obstacle)) {
+          triggerGameOver();
+          return; // Stop the game loop immediately
+        }
       }
 
       // --- APPLY JUMP PHYSICS ---
@@ -234,18 +283,18 @@ export function GameCanvas() {
       ctx.shadowOffsetY = 5;
       
       // Draw reindeer at current Y position (no bobbing - using physics position)
-      ctx.fillRect(100, reindeerY, REINDEER_SIZE, REINDEER_SIZE);
+      ctx.fillRect(REINDEER_X, reindeerY, REINDEER_SIZE, REINDEER_SIZE);
       ctx.shadowBlur = 0;
       ctx.shadowOffsetY = 0;
       
       // Eyes
       ctx.fillStyle = "white";
-      ctx.fillRect(100 + 25, reindeerY + 5, 5, 5);
+      ctx.fillRect(REINDEER_X + 25, reindeerY + 5, 5, 5);
       
       // Nose
       ctx.fillStyle = "#fbbf24"; // Glowing nose
       ctx.beginPath();
-      ctx.arc(100 + 35, reindeerY + 20, 5, 0, Math.PI * 2);
+      ctx.arc(REINDEER_X + 35, reindeerY + 20, 5, 0, Math.PI * 2);
       ctx.fill();
 
       // Score
@@ -258,6 +307,37 @@ export function GameCanvas() {
 
     if (isPlaying) {
       requestRef.current = requestAnimationFrame(animate);
+    } else if (gameOver) {
+      // --- GAME OVER SCREEN ---
+      ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+      
+      // Draw dark background
+      ctx.fillStyle = "#0f172a";
+      ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+      
+      // Draw static ground at the bottom
+      ctx.fillStyle = "#f1f5f9";
+      ctx.fillRect(0, CANVAS_HEIGHT - 20, CANVAS_WIDTH, 20);
+      
+      // Semi-transparent overlay for game over effect
+      ctx.fillStyle = "rgba(0, 0, 0, 0.5)";
+      ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+      
+      // "Game Over" text
+      ctx.fillStyle = "#ef4444"; // Red color
+      ctx.font = "bold 60px 'Mountains of Christmas'";
+      ctx.textAlign = "center";
+      ctx.fillText("Game Over!", CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 - 30);
+      
+      // Final score
+      ctx.fillStyle = "#f1f5f9";
+      ctx.font = "30px 'Mountains of Christmas'";
+      ctx.fillText(`Final Score: ${score}`, CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 + 20);
+      
+      // Restart instruction
+      ctx.fillStyle = "#94a3b8";
+      ctx.font = "20px 'Mountains of Christmas'";
+      ctx.fillText("Press R to restart", CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 + 60);
     } else {
       // Initial render when not playing
       ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
