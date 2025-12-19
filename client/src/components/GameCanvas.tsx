@@ -16,6 +16,26 @@ export function GameCanvas() {
   const [playerName, setPlayerName] = useState("");
   const [gameOver, setGameOver] = useState(false);
   
+  // Responsive canvas dimensions - 1:1 on mobile, 2:1 on desktop
+  const [canvasDimensions, setCanvasDimensions] = useState({ width: 800, height: 400 });
+  
+  useEffect(() => {
+    const updateDimensions = () => {
+      const isMobile = window.innerWidth < 768; // md breakpoint
+      if (isMobile) {
+        // 1:1 aspect ratio on mobile
+        setCanvasDimensions({ width: 400, height: 400 });
+      } else {
+        // 2:1 aspect ratio on desktop
+        setCanvasDimensions({ width: 800, height: 400 });
+      }
+    };
+    
+    updateDimensions();
+    window.addEventListener('resize', updateDimensions);
+    return () => window.removeEventListener('resize', updateDimensions);
+  }, []);
+  
   const createScore = useCreateScore();
   const { data: scores } = useScores();
   
@@ -37,9 +57,9 @@ export function GameCanvas() {
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
-    // Game constants
-    const CANVAS_WIDTH = 800;
-    const CANVAS_HEIGHT = 400;
+    // Game constants - use dynamic dimensions
+    const CANVAS_WIDTH = canvasDimensions.width;
+    const CANVAS_HEIGHT = canvasDimensions.height;
     const REINDEER_SIZE = 40;
     
     // --- GROUND SCROLLING CONFIGURATION ---
@@ -793,7 +813,7 @@ export function GameCanvas() {
       canvas.removeEventListener("touchend", handleTouchEnd);
       canvas.removeEventListener("touchmove", handleTouchMove);
     };
-  }, [isPlaying, gameOver]);
+  }, [isPlaying, gameOver, canvasDimensions]);
 
   const handleStart = () => {
     setIsPlaying(true);
@@ -820,12 +840,12 @@ export function GameCanvas() {
 
   return (
     <div className="flex flex-col items-center gap-4 md:gap-8 w-full max-w-4xl mx-auto px-2 md:px-4">
-      <div className="relative group rounded-xl md:rounded-3xl overflow-hidden shadow-2xl shadow-primary/20 border-2 md:border-4 border-white/10 bg-black w-full">
+      <div className="relative group rounded-xl md:rounded-3xl overflow-hidden shadow-2xl shadow-primary/20 border-2 md:border-4 border-white/10 bg-black w-full aspect-square md:aspect-[2/1]">
         <canvas
           ref={canvasRef}
-          width={800}
-          height={400}
-          className="block w-full h-auto bg-slate-900"
+          width={canvasDimensions.width}
+          height={canvasDimensions.height}
+          className="absolute inset-0 w-full h-full bg-slate-900"
         />
         
         {/* Overlay for score display - only show while playing */}
