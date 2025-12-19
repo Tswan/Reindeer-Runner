@@ -62,9 +62,9 @@ export default function Home() {
         </section>
       </main>
       
-      {/* Footer background SVG */}
+      {/* Footer background SVG - positioned to start 98px above scoreboard */}
       <svg 
-        className="absolute bottom-0 left-0 w-full pointer-events-none z-0"
+        className="absolute bottom-0 left-0 w-full h-[calc(100%-400px)] min-h-[400px] pointer-events-none z-0"
         viewBox="0 0 1419 676" 
         fill="none" 
         xmlns="http://www.w3.org/2000/svg"
