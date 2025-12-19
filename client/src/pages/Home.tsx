@@ -84,7 +84,7 @@ export default function Home() {
 
         {/* Footer */}
         <footer className="relative z-10 pb-4 w-full text-center text-white/50 text-sm">
-          <p>Built for the holidays</p>
+          <p>Built for the holidays by <a href="https://travisswan.com/" target="_blank" rel="noopener noreferrer" className="underline hover:text-white/70" data-testid="link-portfolio">Travis</a></p>
         </footer>
       </div>
     </div>
