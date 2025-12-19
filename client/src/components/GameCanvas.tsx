@@ -696,15 +696,20 @@ export function GameCanvas() {
   }, [isPlaying, gameOver]);
 
   const handleStart = () => {
-    if (!playerName.trim()) return;
     setIsPlaying(true);
     setGameOver(false);
     setScore(0);
+    setPlayerName(""); // Reset name for new game
   };
 
   const handleGameOver = () => {
     setIsPlaying(false);
     setGameOver(true);
+    // Don't auto-submit score - let player choose to add to leaderboard
+  };
+  
+  const handleSubmitScore = () => {
+    if (!playerName.trim()) return;
     createScore.mutate({ playerName, score });
   };
 
@@ -730,33 +735,61 @@ export function GameCanvas() {
       </div>
 
       <div className="flex flex-col md:flex-row items-center gap-4 w-full justify-center">
-        {!isPlaying ? (
-          <div className="flex gap-4 items-end bg-card p-6 rounded-2xl border border-white/5 shadow-xl">
-            <div className="grid w-full max-w-sm items-center gap-1.5">
-              <Label htmlFor="player" className="text-white/80">Reindeer Name</Label>
-              <Input
-                type="text"
-                id="player"
-                placeholder="Rudolph"
-                value={playerName}
-                onChange={(e) => setPlayerName(e.target.value)}
-                className="bg-black/20 border-white/10 text-white placeholder:text-white/30"
-              />
+        {!isPlaying && !gameOver && (
+          <Button 
+            onClick={handleStart} 
+            size="lg"
+            data-testid="button-start"
+            className="bg-accent hover:bg-accent/90 text-white font-bold text-lg px-8 shadow-lg shadow-accent/20 transition-all hover:-translate-y-1"
+          >
+            <Play className="mr-2 h-5 w-5" /> Start Run
+          </Button>
+        )}
+        
+        {gameOver && (
+          <div className="flex flex-col gap-4 items-center bg-card p-6 rounded-2xl border border-white/5 shadow-xl">
+            <p className="text-white text-lg font-display">Your Score: <span className="text-accent font-bold">{score}</span></p>
+            
+            <div className="flex gap-4 items-end">
+              <div className="grid w-full max-w-sm items-center gap-1.5">
+                <Label htmlFor="player" className="text-white/80">Add to Leaderboard</Label>
+                <Input
+                  type="text"
+                  id="player"
+                  placeholder="Enter your name"
+                  value={playerName}
+                  onChange={(e) => setPlayerName(e.target.value)}
+                  data-testid="input-player-name"
+                  className="bg-black/20 border-white/10 text-white placeholder:text-white/30"
+                />
+              </div>
+              <Button 
+                onClick={handleSubmitScore} 
+                disabled={!playerName.trim() || createScore.isPending}
+                data-testid="button-submit-score"
+                className="bg-accent hover:bg-accent/90"
+              >
+                {createScore.isPending ? "Saving..." : "Submit"}
+              </Button>
             </div>
+            
             <Button 
               onClick={handleStart} 
-              disabled={!playerName}
               size="lg"
-              className="bg-accent hover:bg-accent/90 text-white font-bold text-lg px-8 shadow-lg shadow-accent/20 transition-all hover:-translate-y-1"
+              data-testid="button-play-again"
+              className="bg-primary hover:bg-primary/90 text-white font-bold"
             >
-              <Play className="mr-2 h-5 w-5" /> Start Run
+              <RotateCcw className="mr-2 h-5 w-5" /> Play Again
             </Button>
           </div>
-        ) : (
+        )}
+        
+        {isPlaying && (
           <Button 
             onClick={handleStop} 
             variant="destructive"
             size="lg"
+            data-testid="button-stop"
             className="font-bold shadow-lg shadow-destructive/20"
           >
             <RotateCcw className="mr-2 h-5 w-5" /> End Run (Test)
