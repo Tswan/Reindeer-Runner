@@ -819,13 +819,13 @@ export function GameCanvas() {
   };
 
   return (
-    <div className="flex flex-col items-center gap-8 w-full max-w-4xl mx-auto p-4">
-      <div className="relative group rounded-3xl overflow-hidden shadow-2xl shadow-primary/20 border-4 border-white/10 bg-black">
+    <div className="flex flex-col items-center gap-4 md:gap-8 w-full max-w-4xl mx-auto px-2 md:px-4">
+      <div className="relative group rounded-xl md:rounded-3xl overflow-hidden shadow-2xl shadow-primary/20 border-2 md:border-4 border-white/10 bg-black w-full">
         <canvas
           ref={canvasRef}
           width={800}
           height={400}
-          className="block w-full h-auto max-w-[800px] bg-slate-900"
+          className="block w-full h-auto bg-slate-900"
         />
         
         {/* Overlay for score display - only show while playing */}
