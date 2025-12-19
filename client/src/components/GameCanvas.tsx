@@ -839,7 +839,7 @@ export function GameCanvas() {
   };
 
   return (
-    <div className="flex flex-col items-center gap-4 md:gap-8 w-full max-w-4xl mx-auto px-2 md:px-4">
+    <div className="flex flex-col items-center gap-4 md:gap-8 w-full max-w-4xl mx-auto px-2 md:px-4 mt-10">
       <div className="relative group rounded-xl md:rounded-3xl overflow-hidden shadow-2xl shadow-primary/20 border-2 md:border-4 border-white/10 bg-black w-full aspect-square md:aspect-[2/1]">
         <canvas
           ref={canvasRef}
