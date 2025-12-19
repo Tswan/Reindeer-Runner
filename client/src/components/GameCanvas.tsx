@@ -4,6 +4,7 @@ import { Play, RotateCcw } from "lucide-react";
 import { useCreateScore } from "@/hooks/use-scores";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import treePng from "@assets/tree_1766176137201.png";
 
 export function GameCanvas() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -71,10 +72,18 @@ export function GameCanvas() {
     
     // --- OBSTACLE CONFIGURATION ---
     // Obstacles spawn from the right and move left toward the player
-    const OBSTACLE_WIDTH = 30;          // Width of obstacle rectangles
-    const OBSTACLE_HEIGHT = 50;         // Height of obstacle rectangles
+    const OBSTACLE_WIDTH = 60;          // Width of tree obstacle
+    const OBSTACLE_HEIGHT = 70;         // Height of tree obstacle
     const MIN_SPAWN_DELAY = 60;         // Minimum frames between obstacle spawns
     const MAX_SPAWN_DELAY = 150;        // Maximum frames between obstacle spawns
+    
+    // --- LOAD TREE IMAGE ---
+    const treeImage = new Image();
+    treeImage.src = treePng;
+    let treeImageLoaded = false;
+    treeImage.onload = () => {
+      treeImageLoaded = true;
+    };
     
     // Obstacle type definition
     interface Obstacle {
@@ -465,13 +474,14 @@ export function GameCanvas() {
           ctx.fillRect(obstacle.x + 10, obstacle.y + 5, obstacle.width - 20, 5);
           ctx.fillRect(obstacle.x + 5, obstacle.y + 15, obstacle.width - 10, 5);
         } else {
-          // Ground obstacle (tree stump) - green color, must jump over
-          ctx.fillStyle = "#166534"; // Dark green for trees
-          ctx.fillRect(obstacle.x, obstacle.y, obstacle.width, obstacle.height);
-          
-          // Add a lighter top to make it look more like a tree/stump
-          ctx.fillStyle = "#22c55e"; // Lighter green
-          ctx.fillRect(obstacle.x + 5, obstacle.y, obstacle.width - 10, 10);
+          // Ground obstacle (tree) - use tree PNG image
+          if (treeImageLoaded) {
+            ctx.drawImage(treeImage, obstacle.x, obstacle.y, obstacle.width, obstacle.height);
+          } else {
+            // Fallback if image not loaded yet
+            ctx.fillStyle = "#166534";
+            ctx.fillRect(obstacle.x, obstacle.y, obstacle.width, obstacle.height);
+          }
         }
         
         // --- CHECK COLLISION WITH REINDEER ---
