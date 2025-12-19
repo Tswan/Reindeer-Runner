@@ -112,6 +112,73 @@ export function GameCanvas() {
     const CARROT_SPAWN_CHANCE = 0.02;   // 2% chance per frame to spawn
     const carrots: Carrot[] = [];
     
+    // --- SNOW PARTICLES ---
+    // Lightweight particle system for background snow effect
+    interface Snowflake {
+      x: number;
+      y: number;
+      size: number;
+      speed: number;
+      opacity: number;
+    }
+    
+    const SNOWFLAKE_COUNT = 50;         // Number of snowflakes
+    const snowflakes: Snowflake[] = [];
+    
+    // Initialize snowflakes
+    for (let i = 0; i < SNOWFLAKE_COUNT; i++) {
+      snowflakes.push({
+        x: Math.random() * CANVAS_WIDTH,
+        y: Math.random() * CANVAS_HEIGHT,
+        size: Math.random() * 3 + 1,
+        speed: Math.random() * 1 + 0.5,
+        opacity: Math.random() * 0.5 + 0.3
+      });
+    }
+    
+    // --- PARALLAX BACKGROUND ---
+    // Multiple layers moving at different speeds for depth effect
+    interface Mountain {
+      x: number;
+      width: number;
+      height: number;
+      color: string;
+    }
+    
+    // Far mountains (slow movement)
+    const farMountains: Mountain[] = [];
+    for (let i = 0; i < 5; i++) {
+      farMountains.push({
+        x: i * 200 - 50,
+        width: 250,
+        height: 80 + Math.random() * 40,
+        color: "#334155"
+      });
+    }
+    
+    // Near mountains (faster movement)
+    const nearMountains: Mountain[] = [];
+    for (let i = 0; i < 4; i++) {
+      nearMountains.push({
+        x: i * 250 - 30,
+        width: 300,
+        height: 60 + Math.random() * 30,
+        color: "#475569"
+      });
+    }
+    
+    let farMountainOffset = 0;
+    let nearMountainOffset = 0;
+    
+    // --- SCREEN SHAKE ---
+    // Brief shake effect on collision for impact feedback
+    let shakeIntensity = 0;
+    let shakeDuration = 0;
+    
+    // --- RUNNING ANIMATION ---
+    // Subtle bobbing motion when on ground
+    let runBobOffset = 0;
+    
     // Track when to spawn the next obstacle
     // Using random delay creates varied spacing between obstacles
     let framesSinceLastSpawn = 0;
@@ -141,6 +208,9 @@ export function GameCanvas() {
     // --- TRIGGER GAME OVER ---
     // Called when collision is detected
     const triggerGameOver = () => {
+      // Trigger screen shake
+      shakeIntensity = 8;
+      shakeDuration = 15;
       setIsPlaying(false);
       setGameOver(true);
     };
@@ -204,6 +274,20 @@ export function GameCanvas() {
       // Clear canvas
       ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
 
+      // --- SCREEN SHAKE ---
+      // Apply shake offset if active
+      let shakeX = 0;
+      let shakeY = 0;
+      if (shakeDuration > 0) {
+        shakeX = (Math.random() - 0.5) * shakeIntensity;
+        shakeY = (Math.random() - 0.5) * shakeIntensity;
+        shakeDuration--;
+        shakeIntensity *= 0.9; // Decay shake
+      }
+      
+      ctx.save();
+      ctx.translate(shakeX, shakeY);
+      
       // --- DRAW BACKGROUND ---
       // Sky gradient
       const gradient = ctx.createLinearGradient(0, 0, 0, CANVAS_HEIGHT);
@@ -221,11 +305,67 @@ export function GameCanvas() {
       ctx.fill();
       ctx.shadowBlur = 0;
 
-      // Stars (static for now, could be an array)
-      ctx.fillStyle = "white";
-      if (Math.random() > 0.95) {
-        ctx.fillRect(Math.random() * CANVAS_WIDTH, Math.random() * CANVAS_HEIGHT / 2, 2, 2);
+      // --- PARALLAX MOUNTAINS ---
+      // Update mountain offsets based on current speed
+      farMountainOffset += currentSpeed * 0.2;  // Slow - far away
+      nearMountainOffset += currentSpeed * 0.5; // Medium - closer
+      
+      // Wrap mountain offsets
+      if (farMountainOffset >= 200) farMountainOffset = 0;
+      if (nearMountainOffset >= 250) nearMountainOffset = 0;
+      
+      // Draw far mountains (darker, slower)
+      for (const mountain of farMountains) {
+        const drawX = mountain.x - farMountainOffset;
+        const wrappedX = drawX < -mountain.width ? drawX + 1000 : drawX;
+        
+        ctx.fillStyle = mountain.color;
+        ctx.beginPath();
+        ctx.moveTo(wrappedX, GROUND_Y);
+        ctx.lineTo(wrappedX + mountain.width / 2, GROUND_Y - mountain.height);
+        ctx.lineTo(wrappedX + mountain.width, GROUND_Y);
+        ctx.closePath();
+        ctx.fill();
       }
+      
+      // Draw near mountains (lighter, faster)
+      for (const mountain of nearMountains) {
+        const drawX = mountain.x - nearMountainOffset;
+        const wrappedX = drawX < -mountain.width ? drawX + 1000 : drawX;
+        
+        ctx.fillStyle = mountain.color;
+        ctx.beginPath();
+        ctx.moveTo(wrappedX, GROUND_Y);
+        ctx.lineTo(wrappedX + mountain.width / 2, GROUND_Y - mountain.height);
+        ctx.lineTo(wrappedX + mountain.width, GROUND_Y);
+        ctx.closePath();
+        ctx.fill();
+      }
+      
+      // --- SNOW PARTICLES ---
+      // Update and draw snowflakes
+      ctx.fillStyle = "white";
+      for (const flake of snowflakes) {
+        // Move snowflake down and slightly sideways
+        flake.y += flake.speed;
+        flake.x -= currentSpeed * 0.3; // Drift with world movement
+        
+        // Wrap around when off screen
+        if (flake.y > CANVAS_HEIGHT) {
+          flake.y = -5;
+          flake.x = Math.random() * CANVAS_WIDTH;
+        }
+        if (flake.x < 0) {
+          flake.x = CANVAS_WIDTH;
+        }
+        
+        // Draw snowflake
+        ctx.globalAlpha = flake.opacity;
+        ctx.beginPath();
+        ctx.arc(flake.x, flake.y, flake.size, 0, Math.PI * 2);
+        ctx.fill();
+      }
+      ctx.globalAlpha = 1;
 
       // --- DIFFICULTY PROGRESSION ---
       // Smoothly increase speed over time (capped at MAX_GROUND_SPEED)
@@ -373,6 +513,14 @@ export function GameCanvas() {
         isOnGround = true;          // Allow jumping again
       }
 
+      // --- RUNNING ANIMATION ---
+      // Subtle bobbing when running on ground (not jumping or sliding)
+      if (isOnGround && !isSliding) {
+        runBobOffset = Math.sin(frameCount * 0.3) * 2; // Gentle bob
+      } else {
+        runBobOffset = 0;
+      }
+      
       // --- DRAW ENTITIES ---
       // Reindeer (placeholder box) - adjust for sliding
       ctx.fillStyle = "#ef4444"; // Holiday Red
@@ -382,7 +530,8 @@ export function GameCanvas() {
       
       // Calculate reindeer dimensions based on slide state
       const drawHeight = isSliding ? SLIDE_HEIGHT : REINDEER_SIZE;
-      const drawY = isSliding ? (GROUND_Y - SLIDE_HEIGHT) : reindeerY;
+      const baseDrawY = isSliding ? (GROUND_Y - SLIDE_HEIGHT) : reindeerY;
+      const drawY = baseDrawY + runBobOffset; // Apply bobbing
       const drawWidth = isSliding ? REINDEER_SIZE + 10 : REINDEER_SIZE; // Wider when sliding
       
       // Draw reindeer at current position
@@ -478,6 +627,9 @@ export function GameCanvas() {
       ctx.font = "14px 'Mountains of Christmas'";
       ctx.fillStyle = "rgba(255,255,255,0.6)";
       ctx.fillText(`Speed: ${currentSpeed.toFixed(1)}x`, 20, 55);
+      
+      // Restore canvas state (end screen shake transform)
+      ctx.restore();
 
       requestRef.current = requestAnimationFrame(animate);
     };
