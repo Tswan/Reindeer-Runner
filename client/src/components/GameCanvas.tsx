@@ -847,7 +847,7 @@ export function GameCanvas() {
                   onClick={handleSubmitScore} 
                   disabled={!playerName.trim() || createScore.isPending}
                   data-testid="button-submit-score"
-                  className="border-0 bg-[#f8fafc] text-[#ef486f]"
+                  className="border-0 bg-[#f8fafc] text-[#ef486f] disabled:opacity-100"
                   style={{ 
                     boxShadow: '0 10px 15px -3px rgba(239, 72, 111, 0.2)'
                   }}
