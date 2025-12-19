@@ -728,10 +728,52 @@ export function GameCanvas() {
           className="block w-full h-auto max-w-[800px] bg-slate-900"
         />
         
-        {/* Overlay for controls if needed */}
+        {/* Overlay for score display */}
         <div className="absolute top-4 right-4 bg-black/50 backdrop-blur-md px-4 py-2 rounded-full border border-white/10 text-white font-bold font-display text-xl">
           Score: {score}
         </div>
+        
+        {/* Game Over Overlay */}
+        {gameOver && (
+          <div className="absolute inset-0 flex items-center justify-center bg-black/60 backdrop-blur-sm">
+            <div className="flex flex-col gap-4 items-center bg-card/90 p-6 rounded-2xl border border-white/10 shadow-xl">
+              <h2 className="text-3xl font-display text-destructive font-bold">Game Over!</h2>
+              <p className="text-white text-lg font-display">Your Score: <span className="text-accent font-bold">{score}</span></p>
+              
+              <div className="flex gap-3 items-end">
+                <div className="grid w-full max-w-sm items-center gap-1.5">
+                  <Label htmlFor="player" className="text-white/80 text-sm">Add to Leaderboard</Label>
+                  <Input
+                    type="text"
+                    id="player"
+                    placeholder="Enter your name"
+                    value={playerName}
+                    onChange={(e) => setPlayerName(e.target.value)}
+                    data-testid="input-player-name"
+                    className="bg-black/30 border-white/10 text-white placeholder:text-white/30"
+                  />
+                </div>
+                <Button 
+                  onClick={handleSubmitScore} 
+                  disabled={!playerName.trim() || createScore.isPending}
+                  data-testid="button-submit-score"
+                  className="bg-accent hover:bg-accent/90"
+                >
+                  {createScore.isPending ? "..." : "Submit"}
+                </Button>
+              </div>
+              
+              <Button 
+                onClick={handleStart} 
+                size="lg"
+                data-testid="button-play-again"
+                className="bg-primary hover:bg-primary/90 text-white font-bold mt-2"
+              >
+                <RotateCcw className="mr-2 h-5 w-5" /> Play Again
+              </Button>
+            </div>
+          </div>
+        )}
       </div>
 
       <div className="flex flex-col md:flex-row items-center gap-4 w-full justify-center">
@@ -744,44 +786,6 @@ export function GameCanvas() {
           >
             <Play className="mr-2 h-5 w-5" /> Start Run
           </Button>
-        )}
-        
-        {gameOver && (
-          <div className="flex flex-col gap-4 items-center bg-card p-6 rounded-2xl border border-white/5 shadow-xl">
-            <p className="text-white text-lg font-display">Your Score: <span className="text-accent font-bold">{score}</span></p>
-            
-            <div className="flex gap-4 items-end">
-              <div className="grid w-full max-w-sm items-center gap-1.5">
-                <Label htmlFor="player" className="text-white/80">Add to Leaderboard</Label>
-                <Input
-                  type="text"
-                  id="player"
-                  placeholder="Enter your name"
-                  value={playerName}
-                  onChange={(e) => setPlayerName(e.target.value)}
-                  data-testid="input-player-name"
-                  className="bg-black/20 border-white/10 text-white placeholder:text-white/30"
-                />
-              </div>
-              <Button 
-                onClick={handleSubmitScore} 
-                disabled={!playerName.trim() || createScore.isPending}
-                data-testid="button-submit-score"
-                className="bg-accent hover:bg-accent/90"
-              >
-                {createScore.isPending ? "Saving..." : "Submit"}
-              </Button>
-            </div>
-            
-            <Button 
-              onClick={handleStart} 
-              size="lg"
-              data-testid="button-play-again"
-              className="bg-primary hover:bg-primary/90 text-white font-bold"
-            >
-              <RotateCcw className="mr-2 h-5 w-5" /> Play Again
-            </Button>
-          </div>
         )}
         
         {isPlaying && (
