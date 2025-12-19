@@ -775,11 +775,13 @@ export function GameCanvas() {
           className="block w-full h-auto max-w-[800px] bg-slate-900"
         />
         
-        {/* Overlay for score display - Figma style */}
-        <div className="absolute top-4 right-4 backdrop-blur-md bg-black/50 px-4 py-2 rounded-full border border-white/10">
-          <span className="text-white font-display text-xl font-bold">Score: </span>
-          <span className="font-display text-xl font-bold" style={{ color: '#0de79b' }}>{score}</span>
-        </div>
+        {/* Overlay for score display - only show while playing */}
+        {isPlaying && !gameOver && (
+          <div className="absolute top-4 right-4 backdrop-blur-md bg-black/50 px-4 py-2 rounded-full border border-white/10">
+            <span className="text-white font-display text-xl font-bold">Score: </span>
+            <span className="font-display text-xl font-bold" style={{ color: '#0de79b' }}>{score}</span>
+          </div>
+        )}
         
         {/* Start Overlay - shows before game starts */}
         {!isPlaying && !gameOver && (
