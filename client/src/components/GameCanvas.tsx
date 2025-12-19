@@ -45,9 +45,8 @@ export function GameCanvas() {
     
     // --- SLIDE CONFIGURATION ---
     // Sliding reduces reindeer height to pass under low obstacles
+    // Slide is active as long as the key is held down (no cooldown)
     const SLIDE_HEIGHT = 20;            // Height when sliding (half normal)
-    const SLIDE_DURATION = 30;          // Frames to stay in slide
-    const SLIDE_COOLDOWN = 20;          // Frames before can slide again (prevents spam)
     
     // Game state (refs for loop performance)
     let frameCount = 0;
@@ -55,10 +54,8 @@ export function GameCanvas() {
     let velocityY = 0;                  // Current vertical velocity (positive = falling, negative = rising)
     let isOnGround = true;              // Track if reindeer can jump (only when grounded)
     
-    // Slide state
-    let isSliding = false;              // Currently in slide animation
-    let slideTimer = 0;                 // Frames remaining in current slide
-    let slideCooldownTimer = 0;         // Frames until can slide again
+    // Slide state - now based on key being held down
+    let isSliding = false;              // Currently sliding (key held down)
     
     // --- GROUND SCROLL POSITION ---
     // This tracks how far the ground has scrolled.
@@ -83,9 +80,10 @@ export function GameCanvas() {
     }
     
     // Low obstacle configuration (must slide under)
+    // Positioned so standing reindeer WILL hit it - must slide to pass
     const LOW_OBSTACLE_WIDTH = 60;      // Wider than ground obstacles
     const LOW_OBSTACLE_HEIGHT = 25;     // Low height, floats above ground
-    const LOW_OBSTACLE_Y_OFFSET = 30;   // Height above ground where it floats
+    const LOW_OBSTACLE_Y_OFFSET = 5;    // Very close to ground - forces sliding to avoid
     
     // --- OBSTACLE ARRAY ---
     // Stores all active obstacles on screen
@@ -137,33 +135,32 @@ export function GameCanvas() {
       }
     };
     
-    // --- SLIDE INPUT HANDLER ---
-    // Triggered by down arrow or S key
-    // Only allows sliding when on ground, not already sliding, and cooldown is ready
-    const handleSlide = () => {
-      if (isOnGround && !isSliding && slideCooldownTimer <= 0 && isPlaying && !gameOver) {
-        isSliding = true;
-        slideTimer = SLIDE_DURATION;
-      }
-    };
-    
     // --- EVENT LISTENERS FOR INPUT ---
-    // Spacebar for jump, Down/S for slide, R for restart
+    // Spacebar for jump, Down/S for slide (hold to slide), R for restart
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.code === "Space") {
         e.preventDefault(); // Prevent page scrolling
         handleJump();
       }
-      // Down arrow or S key for sliding
+      // Down arrow or S key - start sliding (hold to continue)
       if (e.code === "ArrowDown" || e.code === "KeyS") {
         e.preventDefault();
-        handleSlide();
+        if (isOnGround && isPlaying && !gameOver) {
+          isSliding = true;
+        }
       }
       // R key to restart game after game over
       if (e.code === "KeyR" && gameOver) {
         setGameOver(false);
         setIsPlaying(true);
         setScore(0);
+      }
+    };
+    
+    // Key up handler - stop sliding when key is released
+    const handleKeyUp = (e: KeyboardEvent) => {
+      if (e.code === "ArrowDown" || e.code === "KeyS") {
+        isSliding = false;
       }
     };
     
@@ -174,6 +171,7 @@ export function GameCanvas() {
     
     // Attach event listeners
     window.addEventListener("keydown", handleKeyDown);
+    window.addEventListener("keyup", handleKeyUp);
     canvas.addEventListener("click", handleCanvasClick);
 
     const animate = () => {
@@ -228,19 +226,11 @@ export function GameCanvas() {
       // Second ground segment (coming in from the right to fill the gap)
       ctx.fillRect(CANVAS_WIDTH - groundScrollX, GROUND_Y, CANVAS_WIDTH, GROUND_HEIGHT);
 
-      // --- SLIDE TIMER UPDATE ---
-      // Decrement slide timer and cooldown each frame
-      if (slideCooldownTimer > 0) {
-        slideCooldownTimer--;
-      }
-      
-      if (isSliding) {
-        slideTimer--;
-        if (slideTimer <= 0) {
-          // End slide and start cooldown
-          isSliding = false;
-          slideCooldownTimer = SLIDE_COOLDOWN;
-        }
+      // --- SLIDE STATE UPDATE ---
+      // Sliding is now controlled by holding the key - no timer needed
+      // If not on ground, cancel slide (can't slide in air)
+      if (!isOnGround) {
+        isSliding = false;
       }
       
       // --- OBSTACLE SPAWNING ---
@@ -453,6 +443,7 @@ export function GameCanvas() {
     return () => {
       if (requestRef.current) cancelAnimationFrame(requestRef.current);
       window.removeEventListener("keydown", handleKeyDown);
+      window.removeEventListener("keyup", handleKeyUp);
       canvas.removeEventListener("click", handleCanvasClick);
     };
   }, [isPlaying, gameOver]);
