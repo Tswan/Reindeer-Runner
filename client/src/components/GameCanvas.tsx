@@ -43,11 +43,22 @@ export function GameCanvas() {
     const JUMP_VELOCITY = -15;          // Initial upward velocity (negative = up)
     const GROUND_LEVEL = CANVAS_HEIGHT - REINDEER_SIZE - GROUND_HEIGHT; // Y position when on ground
     
+    // --- SLIDE CONFIGURATION ---
+    // Sliding reduces reindeer height to pass under low obstacles
+    const SLIDE_HEIGHT = 20;            // Height when sliding (half normal)
+    const SLIDE_DURATION = 30;          // Frames to stay in slide
+    const SLIDE_COOLDOWN = 20;          // Frames before can slide again (prevents spam)
+    
     // Game state (refs for loop performance)
     let frameCount = 0;
     let reindeerY = GROUND_LEVEL;       // Current Y position of reindeer
     let velocityY = 0;                  // Current vertical velocity (positive = falling, negative = rising)
     let isOnGround = true;              // Track if reindeer can jump (only when grounded)
+    
+    // Slide state
+    let isSliding = false;              // Currently in slide animation
+    let slideTimer = 0;                 // Frames remaining in current slide
+    let slideCooldownTimer = 0;         // Frames until can slide again
     
     // --- GROUND SCROLL POSITION ---
     // This tracks how far the ground has scrolled.
@@ -68,7 +79,13 @@ export function GameCanvas() {
       y: number;      // Y position (top edge of obstacle)
       width: number;  // Width of this obstacle
       height: number; // Height of this obstacle
+      type: 'ground' | 'low'; // 'ground' = jump over, 'low' = slide under
     }
+    
+    // Low obstacle configuration (must slide under)
+    const LOW_OBSTACLE_WIDTH = 60;      // Wider than ground obstacles
+    const LOW_OBSTACLE_HEIGHT = 25;     // Low height, floats above ground
+    const LOW_OBSTACLE_Y_OFFSET = 30;   // Height above ground where it floats
     
     // --- OBSTACLE ARRAY ---
     // Stores all active obstacles on screen
@@ -112,7 +129,7 @@ export function GameCanvas() {
     // Triggered by spacebar or canvas click
     // Only allows jumping when the reindeer is on the ground
     const handleJump = () => {
-      if (isOnGround && isPlaying && !gameOver) {
+      if (isOnGround && isPlaying && !gameOver && !isSliding) {
         // Apply initial jump velocity (negative = upward in canvas coordinates)
         velocityY = JUMP_VELOCITY;
         // Mark as airborne to prevent double-jumping
@@ -120,12 +137,27 @@ export function GameCanvas() {
       }
     };
     
-    // --- EVENT LISTENERS FOR JUMP INPUT ---
-    // Spacebar handler and R key for restart
+    // --- SLIDE INPUT HANDLER ---
+    // Triggered by down arrow or S key
+    // Only allows sliding when on ground, not already sliding, and cooldown is ready
+    const handleSlide = () => {
+      if (isOnGround && !isSliding && slideCooldownTimer <= 0 && isPlaying && !gameOver) {
+        isSliding = true;
+        slideTimer = SLIDE_DURATION;
+      }
+    };
+    
+    // --- EVENT LISTENERS FOR INPUT ---
+    // Spacebar for jump, Down/S for slide, R for restart
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.code === "Space") {
         e.preventDefault(); // Prevent page scrolling
         handleJump();
+      }
+      // Down arrow or S key for sliding
+      if (e.code === "ArrowDown" || e.code === "KeyS") {
+        e.preventDefault();
+        handleSlide();
       }
       // R key to restart game after game over
       if (e.code === "KeyR" && gameOver) {
@@ -196,19 +228,50 @@ export function GameCanvas() {
       // Second ground segment (coming in from the right to fill the gap)
       ctx.fillRect(CANVAS_WIDTH - groundScrollX, GROUND_Y, CANVAS_WIDTH, GROUND_HEIGHT);
 
+      // --- SLIDE TIMER UPDATE ---
+      // Decrement slide timer and cooldown each frame
+      if (slideCooldownTimer > 0) {
+        slideCooldownTimer--;
+      }
+      
+      if (isSliding) {
+        slideTimer--;
+        if (slideTimer <= 0) {
+          // End slide and start cooldown
+          isSliding = false;
+          slideCooldownTimer = SLIDE_COOLDOWN;
+        }
+      }
+      
       // --- OBSTACLE SPAWNING ---
       // Check if it's time to spawn a new obstacle
       framesSinceLastSpawn++;
       
       if (framesSinceLastSpawn >= nextSpawnDelay) {
-        // Spawn a new obstacle at the right edge of the screen
-        // Obstacle sits on top of the ground
-        const newObstacle: Obstacle = {
-          x: CANVAS_WIDTH,                                    // Start at right edge
-          y: GROUND_Y - OBSTACLE_HEIGHT,                      // Sit on ground
-          width: OBSTACLE_WIDTH,
-          height: OBSTACLE_HEIGHT
-        };
+        // Randomly choose obstacle type (30% chance for low obstacle)
+        const isLowObstacle = Math.random() < 0.3;
+        
+        let newObstacle: Obstacle;
+        
+        if (isLowObstacle) {
+          // Low obstacle - floats above ground, must slide under
+          newObstacle = {
+            x: CANVAS_WIDTH,
+            y: GROUND_Y - REINDEER_SIZE - LOW_OBSTACLE_Y_OFFSET, // Positioned so standing reindeer hits it
+            width: LOW_OBSTACLE_WIDTH,
+            height: LOW_OBSTACLE_HEIGHT,
+            type: 'low'
+          };
+        } else {
+          // Ground obstacle - sits on ground, must jump over
+          newObstacle = {
+            x: CANVAS_WIDTH,
+            y: GROUND_Y - OBSTACLE_HEIGHT,
+            width: OBSTACLE_WIDTH,
+            height: OBSTACLE_HEIGHT,
+            type: 'ground'
+          };
+        }
         
         obstacles.push(newObstacle);
         
@@ -231,21 +294,37 @@ export function GameCanvas() {
           continue;
         }
         
-        // Draw obstacle (tree/log placeholder - green rectangle)
-        ctx.fillStyle = "#166534"; // Dark green for trees
-        ctx.fillRect(obstacle.x, obstacle.y, obstacle.width, obstacle.height);
-        
-        // Add a lighter top to make it look more like a tree/stump
-        ctx.fillStyle = "#22c55e"; // Lighter green
-        ctx.fillRect(obstacle.x + 5, obstacle.y, obstacle.width - 10, 10);
+        // Draw obstacle based on type
+        if (obstacle.type === 'low') {
+          // Low obstacle (branch/barrier) - brown color, must slide under
+          ctx.fillStyle = "#78350f"; // Dark brown
+          ctx.fillRect(obstacle.x, obstacle.y, obstacle.width, obstacle.height);
+          
+          // Add texture lines
+          ctx.fillStyle = "#92400e"; // Lighter brown
+          ctx.fillRect(obstacle.x + 10, obstacle.y + 5, obstacle.width - 20, 5);
+          ctx.fillRect(obstacle.x + 5, obstacle.y + 15, obstacle.width - 10, 5);
+        } else {
+          // Ground obstacle (tree stump) - green color, must jump over
+          ctx.fillStyle = "#166534"; // Dark green for trees
+          ctx.fillRect(obstacle.x, obstacle.y, obstacle.width, obstacle.height);
+          
+          // Add a lighter top to make it look more like a tree/stump
+          ctx.fillStyle = "#22c55e"; // Lighter green
+          ctx.fillRect(obstacle.x + 5, obstacle.y, obstacle.width - 10, 10);
+        }
         
         // --- CHECK COLLISION WITH REINDEER ---
-        // Define reindeer hitbox (slightly smaller than visual for fairness)
+        // Define reindeer hitbox based on current state (sliding or standing)
+        // When sliding, height is reduced to pass under low obstacles
+        const currentHeight = isSliding ? SLIDE_HEIGHT : REINDEER_SIZE;
+        const currentY = isSliding ? (GROUND_Y - SLIDE_HEIGHT) : reindeerY;
+        
         const reindeerHitbox = {
           x: REINDEER_X + 5,           // Slight padding for forgiving hitbox
-          y: reindeerY + 5,
+          y: currentY + 3,
           width: REINDEER_SIZE - 10,
-          height: REINDEER_SIZE - 5
+          height: currentHeight - 6
         };
         
         // Check if reindeer collides with this obstacle
@@ -276,25 +355,38 @@ export function GameCanvas() {
       }
 
       // --- DRAW ENTITIES ---
-      // Reindeer (placeholder box)
+      // Reindeer (placeholder box) - adjust for sliding
       ctx.fillStyle = "#ef4444"; // Holiday Red
       ctx.shadowColor = "rgba(0,0,0,0.5)";
       ctx.shadowBlur = 10;
       ctx.shadowOffsetY = 5;
       
-      // Draw reindeer at current Y position (no bobbing - using physics position)
-      ctx.fillRect(REINDEER_X, reindeerY, REINDEER_SIZE, REINDEER_SIZE);
+      // Calculate reindeer dimensions based on slide state
+      const drawHeight = isSliding ? SLIDE_HEIGHT : REINDEER_SIZE;
+      const drawY = isSliding ? (GROUND_Y - SLIDE_HEIGHT) : reindeerY;
+      const drawWidth = isSliding ? REINDEER_SIZE + 10 : REINDEER_SIZE; // Wider when sliding
+      
+      // Draw reindeer at current position
+      ctx.fillRect(REINDEER_X, drawY, drawWidth, drawHeight);
       ctx.shadowBlur = 0;
       ctx.shadowOffsetY = 0;
       
-      // Eyes
+      // Eyes (adjust position based on slide)
       ctx.fillStyle = "white";
-      ctx.fillRect(REINDEER_X + 25, reindeerY + 5, 5, 5);
+      if (isSliding) {
+        ctx.fillRect(REINDEER_X + 35, drawY + 5, 5, 5);
+      } else {
+        ctx.fillRect(REINDEER_X + 25, drawY + 5, 5, 5);
+      }
       
-      // Nose
+      // Nose (adjust position based on slide)
       ctx.fillStyle = "#fbbf24"; // Glowing nose
       ctx.beginPath();
-      ctx.arc(REINDEER_X + 35, reindeerY + 20, 5, 0, Math.PI * 2);
+      if (isSliding) {
+        ctx.arc(REINDEER_X + 45, drawY + 10, 4, 0, Math.PI * 2);
+      } else {
+        ctx.arc(REINDEER_X + 35, drawY + 20, 5, 0, Math.PI * 2);
+      }
       ctx.fill();
 
       // Score
@@ -435,7 +527,7 @@ export function GameCanvas() {
       </div>
 
       <p className="text-muted-foreground text-sm text-center max-w-lg">
-        Press SPACEBAR or click the game to jump! Avoid obstacles and see how long you can run.
+        SPACEBAR to jump over stumps, DOWN ARROW or S to slide under branches!
       </p>
     </div>
   );
