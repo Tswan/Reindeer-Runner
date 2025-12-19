@@ -1,0 +1,567 @@
+Implement the following design in React. Use the following files generated from a Figma design as a specification and guide:
+
+```src/styles/wDefault.module.css
+@import "https://fonts.googleapis.com/css?family=Nunito:0,400;0,300;0,700&display=swap";
+@import "https://fonts.googleapis.com/css?family=Mountains+of+Christmas:0,700&display=swap";
+@import "https://fonts.googleapis.com/css?family=Nunito:0,400;0,300;0,700&display=swap";
+.wDefault_8_218 {
+  background: radial-gradient(97.25% 99.1% at 15%, #4c1d951a 0%, #4c1d9500 25%),
+    radial-gradient(108.89% 110.97% at 85% 30%, #0ea5e91a 0%, #0ea5e900 25%),
+    #fff;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+.Vector_10_406 {
+  fill: radial-gradient(
+    47.62% 52.54% at 50.14% 50.19%,
+    #1cb97b 0%,
+    #0f6342 94%
+  );
+  width: 1591px;
+  height: 602px;
+}
+.Vector_10_414 {
+  fill: linear-gradient(0deg, #084c30 7.11%, #043b24 86.27%);
+  width: 1419px;
+  height: 675.371px;
+}
+.Background_8_219 {
+  width: 1419px;
+  height: 1446px;
+}
+.Image_8_220 {
+  opacity: 0.2;
+  background: #d3d3d3 url(<path-to-image>) 0 0/100px 100px;
+  width: 1419px;
+  height: 1446px;
+}
+.FooterBuiltForTheHolidays_8_221 {
+  color: #fff3;
+  text-align: center;
+  flex-direction: column;
+  justify-content: center;
+  width: 148.315px;
+  height: 20px;
+  font-family: Nunito;
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 20px;
+  display: inline-block;
+}
+.Main_8_222 {
+  width: 1280px;
+  height: 1446px;
+}
+.Heading_1ReindeerRunner_8_223 {
+  text-align: center;
+  letter-spacing: 2.4px;
+  -webkit-text-fill-color: transparent;
+  background: linear-gradient(#fff 0%, #dbeafe 50%, #b3d4f9 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  flex-direction: column;
+  justify-content: center;
+  width: 640.735px;
+  height: 96px;
+  font-family: Mountains of Christmas;
+  font-size: 96px;
+  font-style: normal;
+  font-weight: 700;
+  line-height: 96px;
+  display: inline-block;
+}
+.DashThroughTheSnowJumpOverObstaclesAndHelpSantaDeliverPresentsInThisEndlessWinterAdventure_8_224 {
+  color: #d6fff0cc;
+  text-align: center;
+  flex-direction: column;
+  justify-content: center;
+  width: 609.71px;
+  height: 55px;
+  font-family: Nunito;
+  font-size: 20px;
+  font-style: normal;
+  font-weight: 300;
+  line-height: 28px;
+  display: inline-block;
+}
+.Section_8_225 {
+  flex-flow: column;
+  flex-grow: 1;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 20px;
+  width: 896px;
+  padding: 16.5px 44px 23.5px;
+  display: flex;
+}
+.SpacebarToJumpOverStumpsDownArrowOrSToSlideUnderBranches_8_226 {
+  color: #32373f;
+  text-align: center;
+  width: 499px;
+  font-family: Nunito;
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 20px;
+  display: inline-block;
+}
+.BackgroundBorderShadow_8_227 {
+  box-sizing: border-box;
+  background: #000;
+  border: 4px solid #ffffff1a;
+  border-radius: 24px;
+  flex-flow: row;
+  flex-grow: 1;
+  justify-content: flex-start;
+  align-items: flex-start;
+  gap: 0;
+  width: 808px;
+  height: 408px;
+  display: flex;
+  overflow: hidden;
+  box-shadow: 0 25px 50px -12px #0da2e733;
+}
+.Image_8_228 {
+  background: #0f172a;
+  justify-content: center;
+  align-items: center;
+  width: 800px;
+  height: 400px;
+  padding: 0 186.5px 0 187.5px;
+  display: flex;
+  overflow: hidden;
+}
+.OverlayBorderShadow_8_229 {
+  box-sizing: border-box;
+  background: #fff0;
+  border: 1px solid #ffffff0d;
+  border-radius: 16px;
+  flex-flow: column;
+  flex-shrink: 0;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 30px;
+  width: 426px;
+  height: 106px;
+  padding: 13.5px 77.5px 0 76.5px;
+  display: flex;
+  box-shadow:
+    0 20px 25px -5px #0000001a,
+    0 8px 10px -6px #0000001a;
+}
+.Button_8_230 {
+  background: #ef486f;
+  border-radius: 6px;
+  align-items: center;
+  gap: 8px;
+  height: 40px;
+  padding: 12px 20px;
+  display: flex;
+  overflow: hidden;
+  box-shadow:
+    0 10px 15px -3px #ef486f33,
+    0 4px 6px -4px #ef486f33;
+}
+.Svg_8_231 {
+  width: 16px;
+  height: 16px;
+}
+.Start_8_233 {
+  color: #fff;
+  text-align: center;
+  leading-trim: both;
+  text-edge: cap;
+  font-family: Nunito;
+  font-size: 18px;
+  font-style: normal;
+  font-weight: 700;
+  line-height: 28px;
+  display: inline-block;
+}
+.Heading_1ReindeerRunner_8_234 {
+  text-align: center;
+  leading-trim: both;
+  text-edge: cap;
+  letter-spacing: 2.4px;
+  -webkit-text-fill-color: transparent;
+  background: linear-gradient(#fff 0%, #dbeafe 50%, #93c5fd 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  font-family: Mountains of Christmas;
+  font-size: 32px;
+  font-style: normal;
+  font-weight: 700;
+  line-height: 96px;
+  display: inline-block;
+}
+.OverlayBorderOverlayBlur_8_235 {
+  backdrop-filter: blur(6px);
+  box-sizing: border-box;
+  background: #00000080;
+  border: 1px solid #ffffff1a;
+  border-radius: 9999px;
+  justify-content: center;
+  align-items: center;
+  width: 89.24px;
+  height: 46px;
+  padding: 9px 16.631px 9px 17px;
+  display: flex;
+}
+.Score_0_8_236 {
+  color: #fff;
+  flex-direction: column;
+  flex-shrink: 0;
+  justify-content: center;
+  width: 55.609px;
+  height: 28px;
+  font-family: Mountains of Christmas;
+  font-size: 20px;
+  font-style: normal;
+  font-weight: 700;
+  line-height: 28px;
+  display: inline-block;
+}
+.Section_8_237 {
+  backdrop-filter: blur(6px);
+  box-sizing: border-box;
+  background: #fff0;
+  border: 1px solid #ffffff26;
+  border-radius: 24px;
+  width: 448px;
+  height: 344px;
+  overflow: hidden;
+  box-shadow:
+    0 20px 25px -5px #00000026,
+    0 8px 10px -6px #0000001a;
+}
+.BackgroundShadow_8_238 {
+  background: linear-gradient(135deg, #facc15 0%, #d97706 100%);
+  border-radius: 12px;
+  justify-content: center;
+  align-items: center;
+  width: 48px;
+  height: 48px;
+  padding: 12px;
+  display: flex;
+  overflow: hidden;
+  box-shadow:
+    0 10px 15px -3px #f59e0b33,
+    0 4px 6px -4px #f59e0b33;
+}
+.Svg_8_239 {
+  flex-flow: row;
+  flex-shrink: 0;
+  justify-content: flex-start;
+  align-items: flex-start;
+  gap: 0;
+  width: 24px;
+  height: 24px;
+  display: flex;
+}
+.Heading_2Leaderboard_8_246 {
+  color: #fff;
+  letter-spacing: 0.6px;
+  flex-direction: column;
+  justify-content: center;
+  width: 112.774px;
+  height: 32px;
+  font-family: Mountains of Christmas;
+  font-size: 24px;
+  font-style: normal;
+  font-weight: 700;
+  line-height: 32px;
+  display: inline-block;
+}
+.TopRunners_8_247 {
+  color: #94a3b8;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  flex-direction: column;
+  justify-content: center;
+  width: 98.973px;
+  height: 16px;
+  font-family: Nunito;
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 700;
+  line-height: 16px;
+  display: inline-block;
+}
+.BackgroundBorder_8_248 {
+  box-sizing: border-box;
+  background: linear-gradient(90deg, #eab30833 0%, #eab30800 100%);
+  border: 1px solid #eab3084d;
+  border-radius: 12px;
+  width: 398px;
+  height: 66px;
+}
+.Background_8_249 {
+  background: #eab308;
+  border-radius: 9999px;
+  justify-content: center;
+  align-items: center;
+  width: 32px;
+  height: 32px;
+  padding: 6.5px 0;
+  display: flex;
+}
+.generated_1_8_250 {
+  color: #000;
+  text-align: center;
+  flex-direction: column;
+  flex-shrink: 0;
+  justify-content: center;
+  width: 8.795px;
+  height: 19px;
+  font-family: Nunito;
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 700;
+  line-height: 20px;
+  display: inline-block;
+}
+.Santa_8_251 {
+  color: #fff;
+  flex-direction: column;
+  justify-content: center;
+  width: 43.442px;
+  height: 24px;
+  font-family: Nunito;
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 700;
+  line-height: 24px;
+  display: inline-block;
+}
+.Svg_8_252 {
+  flex-flow: column;
+  flex-grow: 1;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 2.0005px;
+  width: 12px;
+  height: 12px;
+  display: flex;
+}
+._000_8_255 {
+  color: #0de79b;
+  flex-direction: column;
+  justify-content: center;
+  width: 53.322px;
+  height: 28px;
+  font-family: Nunito;
+  font-size: 20px;
+  font-style: normal;
+  font-weight: 700;
+  line-height: 28px;
+  display: inline-block;
+}
+.OverlayBorder_8_256 {
+  box-sizing: border-box;
+  background: #ffffff0d;
+  border: 1px solid #0000;
+  border-radius: 12px;
+  width: 398px;
+  height: 66px;
+}
+.Background_8_257 {
+  background: #cbd5e1;
+  border-radius: 9999px;
+  justify-content: center;
+  align-items: center;
+  width: 32px;
+  height: 32px;
+  padding: 6.5px 0;
+  display: flex;
+}
+.generated_2_8_258 {
+  color: #0f172a;
+  text-align: center;
+  flex-direction: column;
+  flex-shrink: 0;
+  justify-content: center;
+  width: 8.795px;
+  height: 19px;
+  font-family: Nunito;
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 700;
+  line-height: 20px;
+  display: inline-block;
+}
+.Rudolph_8_259 {
+  color: #fff;
+  flex-direction: column;
+  justify-content: center;
+  width: 63.524px;
+  height: 24px;
+  font-family: Nunito;
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 700;
+  line-height: 24px;
+  display: inline-block;
+}
+.generated_850_8_260 {
+  color: #0de79b;
+  flex-direction: column;
+  justify-content: center;
+  width: 36.309px;
+  height: 28px;
+  font-family: Nunito;
+  font-size: 20px;
+  font-style: normal;
+  font-weight: 700;
+  line-height: 28px;
+  display: inline-block;
+}
+.OverlayBorder_8_261 {
+  box-sizing: border-box;
+  background: #ffffff0d;
+  border: 1px solid #0000;
+  border-radius: 12px;
+  width: 398px;
+  height: 66px;
+}
+.Background_8_262 {
+  background: #c2410c;
+  border-radius: 9999px;
+  justify-content: center;
+  align-items: center;
+  width: 32px;
+  height: 32px;
+  padding: 6.5px 0;
+  display: flex;
+}
+.generated_3_8_263 {
+  color: #ffedd5;
+  text-align: center;
+  flex-direction: column;
+  flex-shrink: 0;
+  justify-content: center;
+  width: 8.795px;
+  height: 19px;
+  font-family: Nunito;
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 700;
+  line-height: 20px;
+  display: inline-block;
+}
+.Elf_1_8_264 {
+  color: #fff;
+  flex-direction: column;
+  justify-content: center;
+  width: 44.194px;
+  height: 24px;
+  font-family: Nunito;
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 700;
+  line-height: 24px;
+  display: inline-block;
+}
+.generated_500_8_265 {
+  color: #0de79b;
+  flex-direction: column;
+  justify-content: center;
+  width: 36.309px;
+  height: 28px;
+  font-family: Nunito;
+  font-size: 20px;
+  font-style: normal;
+  font-weight: 700;
+  line-height: 28px;
+  display: inline-block;
+}
+.Snowflakes_8_266 {
+  width: 1291.75px;
+  height: 44.23px;
+}
+
+```
+
+---
+
+```src/components/wDefault.tsx
+import React from 'react';
+import styles from '../styles/wDefault.module.css';
+
+
+export default function wDefault() {
+  return (
+    <div className={styles.wDefault_8_218}>
+      <div className={styles.Vector_10_406}><svg width="1591" height="602" viewBox="0 0 1591 602" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M795.505 0C864.355 0 927.375 42.6598 991.264 48.1411C1060.49 54.0814 1138.28 24.0606 1199.27 35.6086C1267.95 48.6134 1308.56 101.803 1363.4 120.755C1429.1 143.465 1519.58 138.849 1559.74 168.145C1609.41 204.385 1585 258.3 1585 301C1585 343.7 1609.41 397.615 1559.74 433.855C1519.58 463.158 1429.11 458.535 1363.4 481.245C1308.56 500.197 1267.95 553.387 1199.27 566.391C1138.28 577.939 1060.49 547.919 991.264 553.859C927.375 559.34 864.345 602 795.495 602C726.645 602 663.625 559.34 599.736 553.859C530.506 547.919 452.716 577.939 391.726 566.391C323.047 553.387 282.437 500.197 227.597 481.245C161.897 458.535 71.4174 463.151 31.2575 433.855C-18.4123 397.615 5.9976 343.7 5.9976 301C5.9976 258.3 -18.4123 204.385 31.2575 168.145C71.4174 138.842 161.887 143.465 227.597 120.755C282.437 101.803 323.047 48.6134 391.726 35.6086C452.716 24.0606 530.506 54.0814 599.736 48.1411C663.625 42.6598 726.655 0 795.505 0Z" fill="url(#paint0_radial_10_406)" />
+          <defs>
+            <radialGradient id="paint0_radial_10_406" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(797.77 302.171) scale(835.887 286.671)">
+              <stop stopColor="#1CB97B" />
+              <stop offset="0.94" stopColor="#0F6342" />
+            </radialGradient>
+          </defs>
+        </svg>
+      </div>
+      <div className={styles.Vector_10_414}><svg width="1419" height="676" viewBox="0 0 1419 676" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M1419 49.1015V675.371H0V17.8615C124.02 -35.4485 144.06 47.5615 283.79 47.5615C423.52 47.5615 425.69 19.1815 567.59 19.1815C709.49 19.1815 709.49 47.5615 851.39 47.5615C993.29 47.5615 993.29 19.1815 1135.19 19.1815C1277.09 19.1815 1283.86 -12.1885 1413.15 46.3015C1415.22 47.2415 1417.17 48.1715 1419 49.1015Z" fill="url(#paint0_linear_10_414)" />
+          <defs>
+            <linearGradient id="paint0_linear_10_414" x1="709.5" y1="627.372" x2="709.5" y2="61.4069" gradientUnits="userSpaceOnUse">
+              <stop stopColor="#084C30" />
+              <stop offset="0.944707" stopColor="#043B24" />
+            </linearGradient>
+          </defs>
+        </svg>
+      </div>
+      <div className={styles.Background_8_219}><span className={styles.FooterBuiltForTheHolidays_8_221}>Built for the holidays &#x1F384;</span>
+        <div className={styles.Main_8_222}><span className={styles.Heading_1ReindeerRunner_8_223}>Reindeer Runner</span><span className={styles.DashThroughTheSnowJumpOverObstaclesAndHelpSantaDeliverPresentsInThisEndlessWinterAdventure_8_224}>Dash through the snow, jump over obstacles, and help Santa deliver
+            presents in this endless winter adventure!</span>
+          <div className={styles.Section_8_225}><span className={styles.SpacebarToJumpOverStumpsDownArrowOrSToSlideUnderBranches_8_226}>SPACEBAR to jump over stumps, DOWN ARROW or S to slide under branches!</span>
+            <div className={styles.BackgroundBorderShadow_8_227}>
+              <div className={styles.Image_8_228}>
+                <div className={styles.OverlayBorderShadow_8_229}>
+                  <div className={styles.Button_8_230}>
+                    <div className={styles.Svg_8_231}><svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M4 2L13.3333 8L4 14V2Z" stroke="white" strokeWidth="1.33333" strokeLinecap="round" strokeLinejoin="round" />
+                      </svg>
+                    </div><span className={styles.Start_8_233}>Start</span>
+                  </div><span className={styles.Heading_1ReindeerRunner_8_234}>Press Start to play!</span>
+                </div>
+              </div>
+              <div className={styles.OverlayBorderOverlayBlur_8_235}><span className={styles.Score_0_8_236}>Score: 0</span></div>
+            </div>
+          </div>
+          <div className={styles.Section_8_237}>
+            <div className={styles.BackgroundShadow_8_238}>
+              <div className={styles.Svg_8_239}><svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M6 9H4.5C3.83696 9 3.20107 8.73661 2.73223 8.26777C2.26339 7.79893 2 7.16304 2 6.5C2 5.83696 2.26339 5.20107 2.73223 4.73223C3.20107 4.26339 3.83696 4 4.5 4H6" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                  <path d="M18 9H19.5C20.163 9 20.7989 8.73661 21.2678 8.26777C21.7366 7.79893 22 7.16304 22 6.5C22 5.83696 21.7366 5.20107 21.2678 4.73223C20.7989 4.26339 20.163 4 19.5 4H18" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                  <path d="M4 22H20" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                  <path d="M10 14.6599V16.9999C10 17.5499 9.53 17.9799 9.03 18.2099C7.85 18.7499 7 20.2399 7 21.9999" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                  <path d="M14 14.6599V16.9999C14 17.5499 14.47 17.9799 14.97 18.2099C16.15 18.7499 17 20.2399 17 21.9999" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                  <path d="M18 2H6V9C6 10.5913 6.63214 12.1174 7.75736 13.2426C8.88258 14.3679 10.4087 15 12 15C13.5913 15 15.1174 14.3679 16.2426 13.2426C17.3679 12.1174 18 10.5913 18 9V2Z" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              </div>
+            </div><span className={styles.Heading_2Leaderboard_8_246}>Leaderboard</span><span className={styles.TopRunners_8_247}>Top Runners</span>
+            <div className={styles.BackgroundBorder_8_248}>
+              <div className={styles.Background_8_249}><span className={styles.generated_1_8_250}>1</span></div><span className={styles.Santa_8_251}>Santa</span>
+              <div className={styles.Svg_8_252}><svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M5.781 1.63308C5.80258 1.59389 5.83429 1.5612 5.87281 1.53844C5.91133 1.51567 5.95525 1.50366 6 1.50366C6.04474 1.50366 6.08867 1.51567 6.12719 1.53844C6.16571 1.5612 6.19742 1.59389 6.219 1.63308L7.695 4.43508C7.7302 4.49997 7.77932 4.55625 7.83885 4.59989C7.89838 4.64354 7.96683 4.67346 8.0393 4.68751C8.11176 4.70157 8.18644 4.6994 8.25797 4.68117C8.32949 4.66294 8.3961 4.6291 8.453 4.58208L10.5915 2.75008C10.6325 2.7167 10.6831 2.69719 10.736 2.69438C10.7888 2.69158 10.8412 2.70561 10.8855 2.73446C10.9299 2.76331 10.964 2.80549 10.9828 2.85493C11.0017 2.90437 11.0044 2.95852 10.9905 3.00958L9.5735 8.13258C9.54457 8.23742 9.48226 8.32996 9.396 8.39619C9.30974 8.46242 9.20424 8.49872 9.0955 8.49958H2.905C2.79617 8.49883 2.69055 8.46258 2.60419 8.39634C2.51784 8.3301 2.45545 8.2375 2.4265 8.13258L1.01 3.01008C0.996124 2.95902 0.998809 2.90487 1.01767 2.85543C1.03653 2.80599 1.07059 2.76381 1.11495 2.73496C1.15931 2.70611 1.21168 2.69208 1.26452 2.69488C1.31736 2.69769 1.36795 2.7172 1.409 2.75058L3.547 4.58258C3.6039 4.62961 3.6705 4.66344 3.74203 4.68167C3.81356 4.6999 3.88823 4.70207 3.9607 4.68801C4.03316 4.67396 4.10162 4.64404 4.16114 4.60039C4.22067 4.55675 4.2698 4.50047 4.305 4.43558L5.781 1.63308Z" stroke="#EAB308" strokeLinecap="round" strokeLinejoin="round" />
+                  <path d="M2.5 10.5H9.5" stroke="#EAB308" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              </div><span className={styles._000_8_255}>1,000</span>
+            </div>
+            <div className={styles.OverlayBorder_8_256}>
+              <div className={styles.Background_8_257}><span className={styles.generated_2_8_258}>2</span></div><span className={styles.Rudolph_8_259}>Rudolph</span><span className={styles.generated_850_8_260}>850</span>
+            </div>
+            <div className={styles.OverlayBorder_8_261}>
+              <div className={styles.Background_8_262}><span className={styles.generated_3_8_263}>3</span></div><span className={styles.Elf_1_8_264}>Elf #1</span><span className={styles.generated_500_8_265}>500</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+```
+

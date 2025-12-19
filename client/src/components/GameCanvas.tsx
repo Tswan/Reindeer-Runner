@@ -728,21 +728,64 @@ export function GameCanvas() {
           className="block w-full h-auto max-w-[800px] bg-slate-900"
         />
         
-        {/* Overlay for score display */}
-        <div className="absolute top-4 right-4 bg-black/50 backdrop-blur-md px-4 py-2 rounded-full border border-white/10 text-white font-bold font-display text-xl">
-          Score: {score}
+        {/* Overlay for score display - Figma style */}
+        <div className="absolute top-4 right-4 backdrop-blur-md bg-black/50 px-4 py-2 rounded-full border border-white/10">
+          <span className="text-white font-display text-xl font-bold">Score: </span>
+          <span className="font-display text-xl font-bold" style={{ color: '#0de79b' }}>{score}</span>
         </div>
+        
+        {/* Start Overlay - shows before game starts */}
+        {!isPlaying && !gameOver && (
+          <div className="absolute inset-0 flex items-center justify-center">
+            <div className="flex flex-col gap-6 items-center backdrop-blur-md bg-transparent border border-white/5 rounded-2xl p-6 shadow-xl">
+              <h2 
+                className="font-display text-3xl font-bold tracking-wider"
+                style={{ 
+                  background: 'linear-gradient(180deg, #fff 0%, #dbeafe 50%, #93c5fd 100%)',
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                  letterSpacing: '2.4px'
+                }}
+              >
+                Reindeer Runner
+              </h2>
+              <Button 
+                onClick={handleStart} 
+                size="lg"
+                data-testid="button-start"
+                className="font-bold text-lg px-5 py-3 shadow-lg transition-all hover:-translate-y-1"
+                style={{ 
+                  backgroundColor: '#ef486f',
+                  boxShadow: '0 10px 15px -3px rgba(239, 72, 111, 0.2), 0 4px 6px -4px rgba(239, 72, 111, 0.2)'
+                }}
+              >
+                <Play className="mr-2 h-4 w-4" /> Start
+              </Button>
+            </div>
+          </div>
+        )}
         
         {/* Game Over Overlay */}
         {gameOver && (
           <div className="absolute inset-0 flex items-center justify-center bg-black/60 backdrop-blur-sm">
-            <div className="flex flex-col gap-4 items-center bg-card/90 p-6 rounded-2xl border border-white/10 shadow-xl">
-              <h2 className="text-3xl font-display text-destructive font-bold">Game Over!</h2>
-              <p className="text-white text-lg font-display">Your Score: <span className="text-accent font-bold">{score}</span></p>
+            <div className="flex flex-col gap-4 items-center backdrop-blur-md bg-white/5 p-6 rounded-2xl border border-white/15 shadow-xl">
+              <h2 
+                className="font-display text-3xl font-bold tracking-wider"
+                style={{ 
+                  background: 'linear-gradient(180deg, #fff 0%, #dbeafe 50%, #93c5fd 100%)',
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent'
+                }}
+              >
+                Game Over!
+              </h2>
+              <p className="text-white text-lg font-body">
+                Your Score: <span className="font-bold text-xl" style={{ color: '#0de79b' }}>{score}</span>
+              </p>
               
               <div className="flex gap-3 items-end">
                 <div className="grid w-full max-w-sm items-center gap-1.5">
-                  <Label htmlFor="player" className="text-white/80 text-sm">Add to Leaderboard</Label>
+                  <Label htmlFor="player" className="text-white/80 text-sm font-body">Add to Leaderboard</Label>
                   <Input
                     type="text"
                     id="player"
@@ -750,14 +793,17 @@ export function GameCanvas() {
                     value={playerName}
                     onChange={(e) => setPlayerName(e.target.value)}
                     data-testid="input-player-name"
-                    className="bg-black/30 border-white/10 text-white placeholder:text-white/30"
+                    className="bg-black/30 border-white/10 text-white placeholder:text-white/30 font-body"
                   />
                 </div>
                 <Button 
                   onClick={handleSubmitScore} 
                   disabled={!playerName.trim() || createScore.isPending}
                   data-testid="button-submit-score"
-                  className="bg-accent hover:bg-accent/90"
+                  style={{ 
+                    backgroundColor: '#ef486f',
+                    boxShadow: '0 10px 15px -3px rgba(239, 72, 111, 0.2)'
+                  }}
                 >
                   {createScore.isPending ? "..." : "Submit"}
                 </Button>
@@ -767,7 +813,11 @@ export function GameCanvas() {
                 onClick={handleStart} 
                 size="lg"
                 data-testid="button-play-again"
-                className="bg-primary hover:bg-primary/90 text-white font-bold mt-2"
+                className="text-white font-bold mt-2"
+                style={{ 
+                  backgroundColor: '#ef486f',
+                  boxShadow: '0 10px 15px -3px rgba(239, 72, 111, 0.2)'
+                }}
               >
                 <RotateCcw className="mr-2 h-5 w-5" /> Play Again
               </Button>
@@ -776,32 +826,7 @@ export function GameCanvas() {
         )}
       </div>
 
-      <div className="flex flex-col md:flex-row items-center gap-4 w-full justify-center">
-        {!isPlaying && !gameOver && (
-          <Button 
-            onClick={handleStart} 
-            size="lg"
-            data-testid="button-start"
-            className="bg-accent hover:bg-accent/90 text-white font-bold text-lg px-8 shadow-lg shadow-accent/20 transition-all hover:-translate-y-1"
-          >
-            <Play className="mr-2 h-5 w-5" /> Start Run
-          </Button>
-        )}
-        
-        {isPlaying && (
-          <Button 
-            onClick={handleStop} 
-            variant="destructive"
-            size="lg"
-            data-testid="button-stop"
-            className="font-bold shadow-lg shadow-destructive/20"
-          >
-            <RotateCcw className="mr-2 h-5 w-5" /> End Run (Test)
-          </Button>
-        )}
-      </div>
-
-      <p className="text-muted-foreground text-sm text-center max-w-lg">
+      <p className="text-slate-500 text-sm text-center max-w-lg font-body">
         SPACEBAR to jump over stumps, DOWN ARROW or S to slide under branches!
       </p>
     </div>
