@@ -86,6 +86,8 @@ export default {
         sans: ["var(--font-sans)"],
         serif: ["var(--font-serif)"],
         mono: ["var(--font-mono)"],
+        display: ["'Mountains of Christmas', cursive", "var(--font-display)"],
+        body: ["'Nunito', sans-serif", "var(--font-body)"],
       },
       keyframes: {
         "accordion-down": {
