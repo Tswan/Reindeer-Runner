@@ -34,14 +34,55 @@ export function GameCanvas() {
     const GROUND_Y = CANVAS_HEIGHT - GROUND_HEIGHT; // Y position of ground
     const GROUND_SPEED = 5;             // Pixels to scroll per frame (adjust for faster/slower movement)
     
+    // --- JUMP PHYSICS CONFIGURATION ---
+    // These values are tuned for responsive, non-floaty jumping:
+    // - GRAVITY: Acceleration pulling the reindeer down each frame (higher = faster fall)
+    // - JUMP_VELOCITY: Initial upward velocity when jumping (negative = up in canvas coords)
+    // - The ratio of JUMP_VELOCITY to GRAVITY determines jump height and feel
+    const GRAVITY = 0.8;                // Pixels per frame squared (acceleration)
+    const JUMP_VELOCITY = -15;          // Initial upward velocity (negative = up)
+    const GROUND_LEVEL = CANVAS_HEIGHT - REINDEER_SIZE - GROUND_HEIGHT; // Y position when on ground
+    
     // Game state (refs for loop performance)
     let frameCount = 0;
-    let reindeerY = CANVAS_HEIGHT - REINDEER_SIZE - GROUND_HEIGHT; // Starting ground position
+    let reindeerY = GROUND_LEVEL;       // Current Y position of reindeer
+    let velocityY = 0;                  // Current vertical velocity (positive = falling, negative = rising)
+    let isOnGround = true;              // Track if reindeer can jump (only when grounded)
     
     // --- GROUND SCROLL POSITION ---
     // This tracks how far the ground has scrolled.
     // When it exceeds the canvas width, we reset it to create seamless looping.
     let groundScrollX = 0;
+    
+    // --- JUMP INPUT HANDLER ---
+    // Triggered by spacebar or canvas click
+    // Only allows jumping when the reindeer is on the ground
+    const handleJump = () => {
+      if (isOnGround && isPlaying && !gameOver) {
+        // Apply initial jump velocity (negative = upward in canvas coordinates)
+        velocityY = JUMP_VELOCITY;
+        // Mark as airborne to prevent double-jumping
+        isOnGround = false;
+      }
+    };
+    
+    // --- EVENT LISTENERS FOR JUMP INPUT ---
+    // Spacebar handler
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.code === "Space") {
+        e.preventDefault(); // Prevent page scrolling
+        handleJump();
+      }
+    };
+    
+    // Click/tap handler for canvas
+    const handleCanvasClick = () => {
+      handleJump();
+    };
+    
+    // Attach event listeners
+    window.addEventListener("keydown", handleKeyDown);
+    canvas.addEventListener("click", handleCanvasClick);
 
     const animate = () => {
       if (!isPlaying || gameOver) return;
@@ -95,6 +136,26 @@ export function GameCanvas() {
       // Second ground segment (coming in from the right to fill the gap)
       ctx.fillRect(CANVAS_WIDTH - groundScrollX, GROUND_Y, CANVAS_WIDTH, GROUND_HEIGHT);
 
+      // --- APPLY JUMP PHYSICS ---
+      // Physics simulation using velocity-based movement:
+      // 1. Add gravity to velocity each frame (accelerates downward)
+      // 2. Add velocity to position (moves the reindeer)
+      // 3. Check for ground collision to stop falling
+      
+      // Apply gravity: velocity increases each frame (pulls downward)
+      velocityY += GRAVITY;
+      
+      // Apply velocity to position: move reindeer by current velocity
+      reindeerY += velocityY;
+      
+      // Ground collision detection:
+      // If reindeer has fallen to or below ground level, snap to ground and stop
+      if (reindeerY >= GROUND_LEVEL) {
+        reindeerY = GROUND_LEVEL;  // Snap to ground (prevent sinking)
+        velocityY = 0;              // Stop vertical movement
+        isOnGround = true;          // Allow jumping again
+      }
+
       // --- DRAW ENTITIES ---
       // Reindeer (placeholder box)
       ctx.fillStyle = "#ef4444"; // Holiday Red
@@ -102,21 +163,19 @@ export function GameCanvas() {
       ctx.shadowBlur = 10;
       ctx.shadowOffsetY = 5;
       
-      // Simple jump logic simulation (bobbing)
-      const bobOffset = Math.sin(frameCount * 0.1) * 5;
-      
-      ctx.fillRect(100, reindeerY + bobOffset, REINDEER_SIZE, REINDEER_SIZE);
+      // Draw reindeer at current Y position (no bobbing - using physics position)
+      ctx.fillRect(100, reindeerY, REINDEER_SIZE, REINDEER_SIZE);
       ctx.shadowBlur = 0;
       ctx.shadowOffsetY = 0;
       
       // Eyes
       ctx.fillStyle = "white";
-      ctx.fillRect(100 + 25, reindeerY + bobOffset + 5, 5, 5);
+      ctx.fillRect(100 + 25, reindeerY + 5, 5, 5);
       
       // Nose
       ctx.fillStyle = "#fbbf24"; // Glowing nose
       ctx.beginPath();
-      ctx.arc(100 + 35, reindeerY + bobOffset + 20, 5, 0, Math.PI * 2);
+      ctx.arc(100 + 35, reindeerY + 20, 5, 0, Math.PI * 2);
       ctx.fill();
 
       // Score
@@ -148,8 +207,11 @@ export function GameCanvas() {
       ctx.fillText("Press Start to Play!", CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2);
     }
 
+    // Cleanup function: remove event listeners and cancel animation frame
     return () => {
       if (requestRef.current) cancelAnimationFrame(requestRef.current);
+      window.removeEventListener("keydown", handleKeyDown);
+      canvas.removeEventListener("click", handleCanvasClick);
     };
   }, [isPlaying, gameOver]);
 
@@ -223,7 +285,7 @@ export function GameCanvas() {
       </div>
 
       <p className="text-muted-foreground text-sm text-center max-w-lg">
-        Control your reindeer with the spacebar to jump over obstacles and collect presents! (Controls coming soon)
+        Press SPACEBAR or click the game to jump! Avoid obstacles and see how long you can run.
       </p>
     </div>
   );
