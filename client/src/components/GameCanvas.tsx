@@ -5,6 +5,7 @@ import { useCreateScore } from "@/hooks/use-scores";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import treePng from "@assets/tree_1766176137201.png";
+import reindeerSpritePng from "@assets/DeerSprite_Run_1766180458247.png";
 
 export function GameCanvas() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -84,6 +85,23 @@ export function GameCanvas() {
     treeImage.onload = () => {
       treeImageLoaded = true;
     };
+    
+    // --- LOAD REINDEER SPRITE SHEET ---
+    const reindeerSprite = new Image();
+    reindeerSprite.src = reindeerSpritePng;
+    let reindeerSpriteLoaded = false;
+    reindeerSprite.onload = () => {
+      reindeerSpriteLoaded = true;
+    };
+    
+    // Sprite animation configuration
+    const SPRITE_FRAME_WIDTH = 128;   // Each frame is 128x128
+    const SPRITE_FRAME_HEIGHT = 128;
+    const SPRITE_TOTAL_FRAMES = 5;    // 5 frames in the run cycle
+    const SPRITE_FPS = 12;            // 12 FPS animation
+    let spriteFrameIndex = 0;
+    let spriteFrameTimer = 0;
+    const SPRITE_FRAME_DURATION = 1000 / SPRITE_FPS; // ms per frame
     
     // Obstacle type definition
     interface Obstacle {
@@ -532,41 +550,65 @@ export function GameCanvas() {
         runBobOffset = 0;
       }
       
-      // --- DRAW ENTITIES ---
-      // Reindeer (placeholder box) - adjust for sliding
-      ctx.fillStyle = "#ef4444"; // Holiday Red
-      ctx.shadowColor = "rgba(0,0,0,0.5)";
-      ctx.shadowBlur = 10;
-      ctx.shadowOffsetY = 5;
+      // --- UPDATE SPRITE ANIMATION ---
+      // Advance sprite frame based on time (using frameCount as proxy for ~16.67ms per frame at 60fps)
+      if (isOnGround && !isSliding) {
+        spriteFrameTimer += 16.67; // Approximate ms per game frame at 60fps
+        if (spriteFrameTimer >= SPRITE_FRAME_DURATION) {
+          spriteFrameTimer -= SPRITE_FRAME_DURATION;
+          spriteFrameIndex = (spriteFrameIndex + 1) % SPRITE_TOTAL_FRAMES;
+        }
+      }
       
+      // --- DRAW REINDEER ---
       // Calculate reindeer dimensions based on slide state
       const drawHeight = isSliding ? SLIDE_HEIGHT : REINDEER_SIZE;
       const baseDrawY = isSliding ? (GROUND_Y - SLIDE_HEIGHT) : reindeerY;
       const drawY = baseDrawY + runBobOffset; // Apply bobbing
-      const drawWidth = isSliding ? REINDEER_SIZE + 10 : REINDEER_SIZE; // Wider when sliding
+      const drawWidth = isSliding ? REINDEER_SIZE + 10 : REINDEER_SIZE;
       
-      // Draw reindeer at current position
-      ctx.fillRect(REINDEER_X, drawY, drawWidth, drawHeight);
-      ctx.shadowBlur = 0;
-      ctx.shadowOffsetY = 0;
-      
-      // Eyes (adjust position based on slide)
-      ctx.fillStyle = "white";
-      if (isSliding) {
-        ctx.fillRect(REINDEER_X + 35, drawY + 5, 5, 5);
+      // Draw sprite or fallback
+      if (reindeerSpriteLoaded && !isSliding) {
+        // Calculate source rectangle from sprite sheet
+        const srcX = spriteFrameIndex * SPRITE_FRAME_WIDTH;
+        const srcY = 0;
+        
+        // Draw the current frame of the sprite
+        // Render at 60x60 to fit game scale (original is 128x128)
+        const renderSize = 60;
+        ctx.drawImage(
+          reindeerSprite,
+          srcX, srcY, SPRITE_FRAME_WIDTH, SPRITE_FRAME_HEIGHT, // Source
+          REINDEER_X - 10, drawY - 20, renderSize, renderSize   // Destination (offset to align with hitbox)
+        );
       } else {
-        ctx.fillRect(REINDEER_X + 25, drawY + 5, 5, 5);
+        // Fallback rectangle for sliding or if sprite not loaded
+        ctx.fillStyle = "#ef4444";
+        ctx.shadowColor = "rgba(0,0,0,0.5)";
+        ctx.shadowBlur = 10;
+        ctx.shadowOffsetY = 5;
+        ctx.fillRect(REINDEER_X, drawY, drawWidth, drawHeight);
+        ctx.shadowBlur = 0;
+        ctx.shadowOffsetY = 0;
+        
+        // Eyes
+        ctx.fillStyle = "white";
+        if (isSliding) {
+          ctx.fillRect(REINDEER_X + 35, drawY + 5, 5, 5);
+        } else {
+          ctx.fillRect(REINDEER_X + 25, drawY + 5, 5, 5);
+        }
+        
+        // Nose
+        ctx.fillStyle = "#fbbf24";
+        ctx.beginPath();
+        if (isSliding) {
+          ctx.arc(REINDEER_X + 45, drawY + 10, 4, 0, Math.PI * 2);
+        } else {
+          ctx.arc(REINDEER_X + 35, drawY + 20, 5, 0, Math.PI * 2);
+        }
+        ctx.fill();
       }
-      
-      // Nose (adjust position based on slide)
-      ctx.fillStyle = "#fbbf24"; // Glowing nose
-      ctx.beginPath();
-      if (isSliding) {
-        ctx.arc(REINDEER_X + 45, drawY + 10, 4, 0, Math.PI * 2);
-      } else {
-        ctx.arc(REINDEER_X + 35, drawY + 20, 5, 0, Math.PI * 2);
-      }
-      ctx.fill();
       
       // --- CARROT SPAWNING ---
       // Random chance to spawn a carrot each frame
