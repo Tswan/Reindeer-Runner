@@ -151,8 +151,8 @@ export function GameCanvas() {
       collected: boolean;
     }
     
-    const PRESENT_WIDTH = 40;
-    const PRESENT_HEIGHT = 40;
+    const PRESENT_WIDTH = 30;
+    const PRESENT_HEIGHT = 30;
     const PRESENT_SCORE_BONUS = 10;      // Points for collecting a present
     const PRESENT_SPAWN_CHANCE = 0.02;   // 2% chance per frame to spawn
     const presents: Present[] = [];
