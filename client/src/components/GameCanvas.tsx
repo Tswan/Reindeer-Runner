@@ -198,10 +198,11 @@ export function GameCanvas() {
       // Two rectangles collide if they overlap on BOTH axes
       // No collision if: one is completely left, right, above, or below the other
       return (
+        // rect1's bottom edge is below rect2's top edge
+        (// rect1's top edge is above rect2's bottom edge
         rect1.x < rect2.x + rect2.width &&   // rect1's left edge is left of rect2's right edge
         rect1.x + rect1.width > rect2.x &&   // rect1's right edge is right of rect2's left edge
-        rect1.y < rect2.y + rect2.height &&  // rect1's top edge is above rect2's bottom edge
-        rect1.y + rect1.height > rect2.y     // rect1's bottom edge is below rect2's top edge
+        rect1.y < rect2.y + rect2.height && rect1.y + rect1.height > rect2.y)
       );
     };
     
@@ -746,9 +747,7 @@ export function GameCanvas() {
                   WebkitTextFillColor: 'transparent',
                   letterSpacing: '2.4px'
                 }}
-              >
-                Reindeer Runner
-              </h2>
+              >Press Start to play!</h2>
               <Button 
                 onClick={handleStart} 
                 size="lg"
@@ -825,7 +824,6 @@ export function GameCanvas() {
           </div>
         )}
       </div>
-
       <p className="text-slate-500 text-sm text-center max-w-lg font-body">
         SPACEBAR to jump over stumps, DOWN ARROW or S to slide under branches!
       </p>
