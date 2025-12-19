@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Play, RotateCcw } from "lucide-react";
-import { useCreateScore } from "@/hooks/use-scores";
+import { useCreateScore, useScores } from "@/hooks/use-scores";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import treePng from "@assets/tree_1766176137201.png";
@@ -15,6 +15,15 @@ export function GameCanvas() {
   const [gameOver, setGameOver] = useState(false);
   
   const createScore = useCreateScore();
+  const { data: scores } = useScores();
+  
+  // Check if score beats top 3
+  const isTopThree = (() => {
+    if (!scores || scores.length < 3) return true; // If less than 3 scores, they're in top 3
+    const top3Scores = scores.slice(0, 3).map(s => s.score);
+    const lowestTop3 = Math.min(...top3Scores);
+    return score > lowestTop3;
+  })();
 
   // Animation frame ID for cleanup
   const requestRef = useRef<number>();
@@ -813,7 +822,7 @@ export function GameCanvas() {
                   WebkitTextFillColor: 'transparent'
                 }}
               >
-                Game Over!
+                {isTopThree ? "Congrats!" : "Nice Try!"}
               </h2>
               <p className="text-white text-lg font-body">
                 Your Score: <span className="font-bold text-xl" style={{ color: '#0de79b' }}>{score}</span>
