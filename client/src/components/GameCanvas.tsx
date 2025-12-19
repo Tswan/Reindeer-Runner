@@ -752,7 +752,7 @@ export function GameCanvas() {
                 onClick={handleStart} 
                 size="lg"
                 data-testid="button-start"
-                className="font-bold text-lg px-5 py-3 shadow-lg transition-all hover:-translate-y-1"
+                className="font-bold text-lg px-5 py-3 shadow-lg transition-all hover:-translate-y-1 pt-[7px] pb-[7px] pl-[22px] pr-[22px]"
                 style={{ 
                   backgroundColor: '#ef486f',
                   boxShadow: '0 10px 15px -3px rgba(239, 72, 111, 0.2), 0 4px 6px -4px rgba(239, 72, 111, 0.2)'
