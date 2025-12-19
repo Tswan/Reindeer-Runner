@@ -32,7 +32,9 @@ export function GameCanvas() {
     // --- GROUND SCROLLING CONFIGURATION ---
     const GROUND_HEIGHT = 20;           // Height of the ground rectangle
     const GROUND_Y = CANVAS_HEIGHT - GROUND_HEIGHT; // Y position of ground
-    const GROUND_SPEED = 5;             // Pixels to scroll per frame (adjust for faster/slower movement)
+    const BASE_GROUND_SPEED = 5;        // Starting speed (pixels per frame)
+    const MAX_GROUND_SPEED = 12;        // Maximum speed cap
+    const SPEED_INCREASE_RATE = 0.001;  // Speed increase per frame (smooth scaling)
     
     // --- JUMP PHYSICS CONFIGURATION ---
     // These values are tuned for responsive, non-floaty jumping:
@@ -57,6 +59,11 @@ export function GameCanvas() {
     // Slide state - now based on key being held down
     let isSliding = false;              // Currently sliding (key held down)
     
+    // --- DIFFICULTY PROGRESSION ---
+    // Speed increases smoothly over time for progressive difficulty
+    let currentSpeed = BASE_GROUND_SPEED;  // Current world speed (increases over time)
+    let internalScore = 0;                 // Internal score tracker for real-time updates
+    
     // --- GROUND SCROLL POSITION ---
     // This tracks how far the ground has scrolled.
     // When it exceeds the canvas width, we reset it to create seamless looping.
@@ -66,7 +73,6 @@ export function GameCanvas() {
     // Obstacles spawn from the right and move left toward the player
     const OBSTACLE_WIDTH = 30;          // Width of obstacle rectangles
     const OBSTACLE_HEIGHT = 50;         // Height of obstacle rectangles
-    const OBSTACLE_SPEED = GROUND_SPEED; // Match ground speed for consistent movement
     const MIN_SPAWN_DELAY = 60;         // Minimum frames between obstacle spawns
     const MAX_SPAWN_DELAY = 150;        // Maximum frames between obstacle spawns
     
@@ -89,6 +95,22 @@ export function GameCanvas() {
     // Stores all active obstacles on screen
     // Obstacles are added when spawned and removed when off-screen
     const obstacles: Obstacle[] = [];
+    
+    // --- CARROT (COLLECTIBLE) CONFIGURATION ---
+    // Carrots spawn randomly and give bonus points when collected
+    interface Carrot {
+      x: number;
+      y: number;
+      width: number;
+      height: number;
+      collected: boolean;
+    }
+    
+    const CARROT_WIDTH = 20;
+    const CARROT_HEIGHT = 30;
+    const CARROT_SCORE_BONUS = 10;      // Points for collecting a carrot
+    const CARROT_SPAWN_CHANCE = 0.02;   // 2% chance per frame to spawn
+    const carrots: Carrot[] = [];
     
     // Track when to spawn the next obstacle
     // Using random delay creates varied spacing between obstacles
@@ -205,19 +227,26 @@ export function GameCanvas() {
         ctx.fillRect(Math.random() * CANVAS_WIDTH, Math.random() * CANVAS_HEIGHT / 2, 2, 2);
       }
 
+      // --- DIFFICULTY PROGRESSION ---
+      // Smoothly increase speed over time (capped at MAX_GROUND_SPEED)
+      currentSpeed = Math.min(MAX_GROUND_SPEED, BASE_GROUND_SPEED + frameCount * SPEED_INCREASE_RATE);
+      
+      // Increase internal score over time (1 point per 30 frames = ~2 per second)
+      if (frameCount % 30 === 0) {
+        internalScore += 1;
+        setScore(internalScore);
+      }
+      
       // --- SCROLLING GROUND ---
       // Update ground scroll position (moves left each frame)
-      groundScrollX += GROUND_SPEED;
+      groundScrollX += currentSpeed;
       
       // Reset scroll position when it exceeds canvas width for seamless loop
-      // Using modulo ensures the ground tiles back to the start without a visible jump
       if (groundScrollX >= CANVAS_WIDTH) {
         groundScrollX = 0;
       }
       
-      // Draw ground - we draw two segments to create seamless scrolling:
-      // 1. First segment: starts at -groundScrollX (moving left off-screen)
-      // 2. Second segment: starts at CANVAS_WIDTH - groundScrollX (fills the gap on the right)
+      // Draw ground - we draw two segments to create seamless scrolling
       ctx.fillStyle = "#f1f5f9"; // Snow white color
       
       // First ground segment (scrolling off to the left)
@@ -275,8 +304,8 @@ export function GameCanvas() {
       for (let i = obstacles.length - 1; i >= 0; i--) {
         const obstacle = obstacles[i];
         
-        // Move obstacle left (toward the player)
-        obstacle.x -= OBSTACLE_SPEED;
+        // Move obstacle left (toward the player) at current speed
+        obstacle.x -= currentSpeed;
         
         // Remove obstacle if it's completely off-screen (left edge)
         if (obstacle.x + obstacle.width < 0) {
@@ -378,11 +407,77 @@ export function GameCanvas() {
         ctx.arc(REINDEER_X + 35, drawY + 20, 5, 0, Math.PI * 2);
       }
       ctx.fill();
-
-      // Score
-      if (frameCount % 60 === 0) { // Every ~1 second
-         setScore(prev => prev + 1);
+      
+      // --- CARROT SPAWNING ---
+      // Random chance to spawn a carrot each frame
+      if (Math.random() < CARROT_SPAWN_CHANCE) {
+        // Spawn carrot at random height (reachable by jumping)
+        const carrotY = GROUND_Y - CARROT_HEIGHT - Math.random() * 80;
+        carrots.push({
+          x: CANVAS_WIDTH,
+          y: carrotY,
+          width: CARROT_WIDTH,
+          height: CARROT_HEIGHT,
+          collected: false
+        });
       }
+      
+      // --- CARROT UPDATE AND DRAW ---
+      // Get reindeer hitbox for collection detection
+      const collectHeight = isSliding ? SLIDE_HEIGHT : REINDEER_SIZE;
+      const collectY = isSliding ? (GROUND_Y - SLIDE_HEIGHT) : reindeerY;
+      const reindeerCollectBox = {
+        x: REINDEER_X,
+        y: collectY,
+        width: isSliding ? REINDEER_SIZE + 10 : REINDEER_SIZE,
+        height: collectHeight
+      };
+      
+      for (let i = carrots.length - 1; i >= 0; i--) {
+        const carrot = carrots[i];
+        
+        // Move carrot left at current speed
+        carrot.x -= currentSpeed;
+        
+        // Remove if off-screen
+        if (carrot.x + carrot.width < 0) {
+          carrots.splice(i, 1);
+          continue;
+        }
+        
+        // Check for collection
+        if (!carrot.collected && checkCollision(reindeerCollectBox, carrot)) {
+          carrot.collected = true;
+          internalScore += CARROT_SCORE_BONUS;
+          setScore(internalScore);
+          carrots.splice(i, 1);
+          continue;
+        }
+        
+        // Draw carrot (orange triangle/cone shape)
+        ctx.fillStyle = "#f97316"; // Orange
+        ctx.beginPath();
+        ctx.moveTo(carrot.x + carrot.width / 2, carrot.y + carrot.height); // Bottom point
+        ctx.lineTo(carrot.x, carrot.y + 5);                                 // Top left
+        ctx.lineTo(carrot.x + carrot.width, carrot.y + 5);                  // Top right
+        ctx.closePath();
+        ctx.fill();
+        
+        // Green top (leaves)
+        ctx.fillStyle = "#22c55e";
+        ctx.fillRect(carrot.x + 5, carrot.y, carrot.width - 10, 8);
+      }
+      
+      // --- DRAW SCORE ON CANVAS ---
+      ctx.fillStyle = "white";
+      ctx.font = "bold 24px 'Mountains of Christmas'";
+      ctx.textAlign = "left";
+      ctx.fillText(`Score: ${internalScore}`, 20, 35);
+      
+      // Draw speed indicator (optional - shows difficulty)
+      ctx.font = "14px 'Mountains of Christmas'";
+      ctx.fillStyle = "rgba(255,255,255,0.6)";
+      ctx.fillText(`Speed: ${currentSpeed.toFixed(1)}x`, 20, 55);
 
       requestRef.current = requestAnimationFrame(animate);
     };
