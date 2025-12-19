@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import treePng from "@assets/tree_1766176137201.png";
 import reindeerSpritePng from "@assets/DeerSprite_Run_1766180458247.png";
+import presentPng from "@assets/present_1766182451587.png";
 
 export function GameCanvas() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -103,6 +104,14 @@ export function GameCanvas() {
       reindeerSpriteLoaded = true;
     };
     
+    // --- LOAD PRESENT IMAGE ---
+    const presentImage = new Image();
+    presentImage.src = presentPng;
+    let presentImageLoaded = false;
+    presentImage.onload = () => {
+      presentImageLoaded = true;
+    };
+    
     // Sprite animation configuration
     const SPRITE_FRAME_WIDTH = 128;   // Each frame is 128x128
     const SPRITE_FRAME_HEIGHT = 128;
@@ -132,9 +141,9 @@ export function GameCanvas() {
     // Obstacles are added when spawned and removed when off-screen
     const obstacles: Obstacle[] = [];
     
-    // --- CARROT (COLLECTIBLE) CONFIGURATION ---
-    // Carrots spawn randomly and give bonus points when collected
-    interface Carrot {
+    // --- PRESENT (COLLECTIBLE) CONFIGURATION ---
+    // Presents spawn randomly and give bonus points when collected
+    interface Present {
       x: number;
       y: number;
       width: number;
@@ -142,11 +151,11 @@ export function GameCanvas() {
       collected: boolean;
     }
     
-    const CARROT_WIDTH = 20;
-    const CARROT_HEIGHT = 30;
-    const CARROT_SCORE_BONUS = 10;      // Points for collecting a carrot
-    const CARROT_SPAWN_CHANCE = 0.02;   // 2% chance per frame to spawn
-    const carrots: Carrot[] = [];
+    const PRESENT_WIDTH = 40;
+    const PRESENT_HEIGHT = 40;
+    const PRESENT_SCORE_BONUS = 10;      // Points for collecting a present
+    const PRESENT_SPAWN_CHANCE = 0.02;   // 2% chance per frame to spawn
+    const presents: Present[] = [];
     
     // --- SNOW PARTICLES ---
     // Lightweight particle system for background snow effect
@@ -613,21 +622,21 @@ export function GameCanvas() {
         ctx.fill();
       }
       
-      // --- CARROT SPAWNING ---
-      // Random chance to spawn a carrot each frame
-      if (Math.random() < CARROT_SPAWN_CHANCE) {
-        // Spawn carrot at random height (reachable by jumping)
-        const carrotY = GROUND_Y - CARROT_HEIGHT - Math.random() * 80;
-        carrots.push({
+      // --- PRESENT SPAWNING ---
+      // Random chance to spawn a present each frame
+      if (Math.random() < PRESENT_SPAWN_CHANCE) {
+        // Spawn present at random height (reachable by jumping)
+        const presentY = GROUND_Y - PRESENT_HEIGHT - Math.random() * 80;
+        presents.push({
           x: CANVAS_WIDTH,
-          y: carrotY,
-          width: CARROT_WIDTH,
-          height: CARROT_HEIGHT,
+          y: presentY,
+          width: PRESENT_WIDTH,
+          height: PRESENT_HEIGHT,
           collected: false
         });
       }
       
-      // --- CARROT UPDATE AND DRAW ---
+      // --- PRESENT UPDATE AND DRAW ---
       // Get reindeer hitbox for collection detection
       const collectHeight = isSliding ? SLIDE_HEIGHT : REINDEER_SIZE;
       const collectY = isSliding ? (GROUND_Y - SLIDE_HEIGHT) : reindeerY;
@@ -638,39 +647,35 @@ export function GameCanvas() {
         height: collectHeight
       };
       
-      for (let i = carrots.length - 1; i >= 0; i--) {
-        const carrot = carrots[i];
+      for (let i = presents.length - 1; i >= 0; i--) {
+        const present = presents[i];
         
-        // Move carrot left at current speed
-        carrot.x -= currentSpeed;
+        // Move present left at current speed
+        present.x -= currentSpeed;
         
         // Remove if off-screen
-        if (carrot.x + carrot.width < 0) {
-          carrots.splice(i, 1);
+        if (present.x + present.width < 0) {
+          presents.splice(i, 1);
           continue;
         }
         
         // Check for collection
-        if (!carrot.collected && checkCollision(reindeerCollectBox, carrot)) {
-          carrot.collected = true;
-          internalScore += CARROT_SCORE_BONUS;
+        if (!present.collected && checkCollision(reindeerCollectBox, present)) {
+          present.collected = true;
+          internalScore += PRESENT_SCORE_BONUS;
           setScore(internalScore);
-          carrots.splice(i, 1);
+          presents.splice(i, 1);
           continue;
         }
         
-        // Draw carrot (orange triangle/cone shape)
-        ctx.fillStyle = "#f97316"; // Orange
-        ctx.beginPath();
-        ctx.moveTo(carrot.x + carrot.width / 2, carrot.y + carrot.height); // Bottom point
-        ctx.lineTo(carrot.x, carrot.y + 5);                                 // Top left
-        ctx.lineTo(carrot.x + carrot.width, carrot.y + 5);                  // Top right
-        ctx.closePath();
-        ctx.fill();
-        
-        // Green top (leaves)
-        ctx.fillStyle = "#22c55e";
-        ctx.fillRect(carrot.x + 5, carrot.y, carrot.width - 10, 8);
+        // Draw present image
+        if (presentImageLoaded) {
+          ctx.drawImage(presentImage, present.x, present.y, present.width, present.height);
+        } else {
+          // Fallback rectangle if image not loaded
+          ctx.fillStyle = "#ec4899";
+          ctx.fillRect(present.x, present.y, present.width, present.height);
+        }
       }
       
       // Restore canvas state (end screen shake transform)
