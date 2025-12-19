@@ -305,15 +305,64 @@ export function GameCanvas() {
       }
     };
     
-    // Click/tap handler for canvas
+    // Click/tap handler for canvas (desktop)
     const handleCanvasClick = () => {
       handleJump();
+    };
+    
+    // --- TOUCH CONTROLS FOR MOBILE ---
+    // Touch upper half = jump, touch lower half = slide
+    let touchStartY = 0;
+    
+    const handleTouchStart = (e: TouchEvent) => {
+      e.preventDefault();
+      if (!isPlaying || gameOver) return;
+      
+      const touch = e.touches[0];
+      const rect = canvas.getBoundingClientRect();
+      const touchY = touch.clientY - rect.top;
+      const canvasMiddle = rect.height / 2;
+      
+      touchStartY = touchY;
+      
+      // Touch upper half = jump, lower half = slide
+      if (touchY < canvasMiddle) {
+        handleJump();
+      } else {
+        // Slide when touching lower half
+        if (isOnGround) {
+          isSliding = true;
+        }
+      }
+    };
+    
+    const handleTouchEnd = (e: TouchEvent) => {
+      e.preventDefault();
+      isSliding = false;
+    };
+    
+    const handleTouchMove = (e: TouchEvent) => {
+      e.preventDefault();
+      // Detect swipe down for slide
+      if (!isPlaying || gameOver) return;
+      
+      const touch = e.touches[0];
+      const rect = canvas.getBoundingClientRect();
+      const touchY = touch.clientY - rect.top;
+      
+      // If swiping down (moved down more than 30px), start sliding
+      if (touchY - touchStartY > 30 && isOnGround) {
+        isSliding = true;
+      }
     };
     
     // Attach event listeners
     window.addEventListener("keydown", handleKeyDown);
     window.addEventListener("keyup", handleKeyUp);
     canvas.addEventListener("click", handleCanvasClick);
+    canvas.addEventListener("touchstart", handleTouchStart, { passive: false });
+    canvas.addEventListener("touchend", handleTouchEnd, { passive: false });
+    canvas.addEventListener("touchmove", handleTouchMove, { passive: false });
 
     const animate = () => {
       if (!isPlaying || gameOver) return;
@@ -740,6 +789,9 @@ export function GameCanvas() {
       window.removeEventListener("keydown", handleKeyDown);
       window.removeEventListener("keyup", handleKeyUp);
       canvas.removeEventListener("click", handleCanvasClick);
+      canvas.removeEventListener("touchstart", handleTouchStart);
+      canvas.removeEventListener("touchend", handleTouchEnd);
+      canvas.removeEventListener("touchmove", handleTouchMove);
     };
   }, [isPlaying, gameOver]);
 
@@ -816,9 +868,9 @@ export function GameCanvas() {
         {/* Game Over Overlay */}
         {gameOver && (
           <div className="absolute inset-0 flex items-center justify-center bg-black/60 backdrop-blur-sm">
-            <div className="flex flex-col gap-4 items-center backdrop-blur-md bg-white/5 p-6 rounded-2xl border border-white/15 shadow-xl">
+            <div className="flex flex-col gap-4 items-center backdrop-blur-md bg-white/5 p-4 md:p-6 rounded-2xl border border-white/15 shadow-xl mx-4">
               <h2 
-                className="font-display text-3xl font-bold tracking-wider"
+                className="font-display text-2xl md:text-3xl font-bold tracking-wider"
                 style={{ 
                   background: 'linear-gradient(180deg, #fff 0%, #dbeafe 50%, #93c5fd 100%)',
                   WebkitBackgroundClip: 'text',
@@ -831,9 +883,9 @@ export function GameCanvas() {
                 Your Score: <span className="font-bold text-xl" style={{ color: '#0de79b' }}>{score}</span>
               </p>
               
-              <div className="flex gap-3 items-end">
-                <div className="grid w-full max-w-sm items-center gap-1.5">
-                  <Label htmlFor="player" className="text-white/80 text-sm font-body">Add to Leaderboard</Label>
+              <div className="flex flex-col sm:flex-row gap-3 items-stretch sm:items-end w-full">
+                <div className="grid w-full items-center gap-1.5">
+                  <Label htmlFor="player" className="text-white/80 text-xs sm:text-sm font-body">Add to Leaderboard</Label>
                   <Input
                     type="text"
                     id="player"
@@ -873,8 +925,11 @@ export function GameCanvas() {
           </div>
         )}
       </div>
-      <p className="text-slate-500 text-sm text-center max-w-lg font-body">
+      <p className="text-slate-500 text-sm text-center max-w-lg font-body hidden md:block">
         SPACEBAR to jump over stumps, DOWN ARROW or S to slide under branches!
+      </p>
+      <p className="text-slate-500 text-sm text-center max-w-lg font-body md:hidden">
+        TAP TOP HALF to jump, TAP BOTTOM HALF or swipe down to slide!
       </p>
     </div>
   );
