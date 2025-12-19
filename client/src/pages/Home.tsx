@@ -59,10 +59,10 @@ export default function Home() {
       </main>
 
       {/* Footer section with SVG background */}
-      <div className="relative mt-[-98px]">
-        {/* Footer background SVG */}
+      <div className="relative">
+        {/* Footer background SVG - extends above container */}
         <svg 
-          className="absolute top-0 left-0 w-full h-full pointer-events-none"
+          className="absolute top-[-50px] left-0 w-full h-[calc(100%+50px)] pointer-events-none"
           viewBox="0 0 1419 676" 
           fill="none" 
           xmlns="http://www.w3.org/2000/svg"
@@ -78,7 +78,7 @@ export default function Home() {
         </svg>
         
         {/* Leaderboard Section */}
-        <section className="relative z-10 flex justify-center pt-[98px] pb-20 container mx-auto px-4">
+        <section className="relative z-10 flex justify-center pt-8 pb-20 container mx-auto px-4">
           <ScoreBoard />
         </section>
 
