@@ -62,9 +62,26 @@ export default function Home() {
         </section>
       </main>
       
+      {/* Footer background SVG */}
+      <svg 
+        className="absolute bottom-0 left-0 w-full pointer-events-none z-0"
+        viewBox="0 0 1419 676" 
+        fill="none" 
+        xmlns="http://www.w3.org/2000/svg"
+        preserveAspectRatio="none"
+      >
+        <path d="M1419 49.1015V675.371H0V17.8615C124.02 -35.4485 144.06 47.5615 283.79 47.5615C423.52 47.5615 425.69 19.1815 567.59 19.1815C709.49 19.1815 709.49 47.5615 851.39 47.5615C993.29 47.5615 993.29 19.1815 1135.19 19.1815C1277.09 19.1815 1283.86 -12.1885 1413.15 46.3015C1415.22 47.2415 1417.17 48.1715 1419 49.1015Z" fill="url(#paint0_linear_12_416)"/>
+        <defs>
+          <linearGradient id="paint0_linear_12_416" x1="709.5" y1="627.372" x2="709.5" y2="61.4069" gradientUnits="userSpaceOnUse">
+            <stop stopColor="#084C30"/>
+            <stop offset="0.944707" stopColor="#043B24"/>
+          </linearGradient>
+        </defs>
+      </svg>
+
       {/* Footer */}
-      <footer className="absolute bottom-4 w-full text-center text-white/20 text-sm">
-        <p>Built for the holidays 🎄</p>
+      <footer className="absolute bottom-4 w-full text-center text-white/50 text-sm z-10">
+        <p>Built for the holidays</p>
       </footer>
     </div>
   );
