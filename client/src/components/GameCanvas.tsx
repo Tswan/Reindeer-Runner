@@ -858,7 +858,7 @@ export function GameCanvas() {
                 onClick={handleStart} 
                 size="lg"
                 data-testid="button-play-again"
-                className="text-white font-bold mt-2"
+                className="text-white font-bold mt-2 border-0"
                 style={{ 
                   backgroundColor: '#ef486f',
                   boxShadow: '0 10px 15px -3px rgba(239, 72, 111, 0.2)'
