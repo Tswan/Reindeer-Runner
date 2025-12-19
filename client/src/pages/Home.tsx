@@ -3,7 +3,7 @@ import { ScoreBoard } from "@/components/ScoreBoard";
 
 export default function Home() {
   return (
-    <div className="min-h-screen w-full relative overflow-hidden bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-slate-900 via-[#0a0f1e] to-black">
+    <div className="min-h-screen w-full relative overflow-hidden bg-white">
       {/* Ambient background effects */}
       <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/stardust.png')] opacity-20 pointer-events-none" />
       
