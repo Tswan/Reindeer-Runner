@@ -23,7 +23,6 @@ export function ScoreBoard() {
           <p className="text-xs text-muted-foreground uppercase tracking-widest font-bold">Top Runners</p>
         </div>
       </div>
-
       <div className="space-y-3">
         {sortedScores.length === 0 ? (
           <div className="text-center py-8 text-muted-foreground">
@@ -55,7 +54,7 @@ export function ScoreBoard() {
                 </div>
               </div>
               
-              <div className="font-mono text-xl font-bold text-primary">
+              <div className="font-mono text-xl font-bold text-[0DE79B]">
                 {score.score.toLocaleString()}
               </div>
             </div>
