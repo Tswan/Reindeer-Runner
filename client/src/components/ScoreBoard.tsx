@@ -54,7 +54,7 @@ export function ScoreBoard() {
                 </div>
               </div>
               
-              <div className="font-mono text-xl font-bold text-[0DE79B]">
+              <div className="font-mono text-xl font-bold text-[#0DE79B]">
                 {score.score.toLocaleString()}
               </div>
             </div>
